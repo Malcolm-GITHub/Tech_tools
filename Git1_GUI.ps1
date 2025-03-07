@@ -53,7 +53,7 @@ $panelRight.BackColor = [System.Drawing.Color]::DarkGray
 $outputTextBox = New-Object System.Windows.Forms.RichTextBox
 $outputTextBox.Multiline = $true
 $outputTextBox.ReadOnly = $true
-$outputTextBox.ScrollBars = "Vertical"
+$outputTextBox.ScrollBars = "None"  # Disable scrollbars
 $outputTextBox.Dock = "Fill"
 $outputTextBox.BackColor = [System.Drawing.Color]::Black  # Black background
 $outputTextBox.ForeColor = [System.Drawing.Color]::LightGray  # Default light gray text
@@ -74,6 +74,8 @@ function Write-OutputToTextBox {
     }
     
     $outputTextBox.AppendText($text + "`r`n")
+    $outputTextBox.SelectionStart = $outputTextBox.TextLength  # Move caret to the end
+    $outputTextBox.ScrollToCaret()  # Scroll to the caret
     $outputTextBox.SelectionColor = $outputTextBox.ForeColor  # Reset color
 }
 
@@ -372,7 +374,7 @@ Write-OutputToTextBox "The following settings are found in the Group Policy Edit
 Write-OutputToTextBox "Group Policy Objects are written to the registry in a single direction, changes made here will not reflect in the GPO" -ForeGroundColor Cyan
 Write-OutputToTextBox "The Script will automatically check for the existence of these settings in the registry and modify them as needed :-)" -ForeGroundColor Cyan
 
-Sleep 3
+Start-Sleep 3
 Write-OutputToTextBox "Prevent access to 16-bit applications" -ForeGroundColor White
 Write-OutputToTextBox "The above Group Policy Setting has been modified in HKLM/SW/Policies/Microsoft/Windows/AppCompat/$Name1 - Set to Enabled" -ForegroundColor Yellow
 
@@ -1089,7 +1091,7 @@ Create-Shortcut -shortcutPath $shortcutPathStartMenu
                         #step 32 - Run TroubleshootingPacks
 
 # Set base directory path for troubleshooting packs
-Clear
+Clear-Host
 $basePath = "C:\Windows\diagnostics\system"  # Replace with actual path
 
 # Set directory for storing answer files
@@ -1181,147 +1183,119 @@ while ($true) {
                         Write-OutputToTextBox "Error: $_" "Red"
                     }
                 }
-                "Install WebApps" {
+                "Install Web Apps" {
                     try {
-                #step 24 - Install Web based applications
+                        # Step 24 - Install Web based applications
+                        Write-OutputToTextBox "Web Apps are being installed, please wait until fully completed." -ForeGround Yellow
+                        Write-OutputToTextBox "Your screen may flicker Black during this process..." -ForegroundColor DarkYellow
+                        Start-Sleep 5
+                        Write-OutputToTextBox ""
+                        Write-OutputToTextBox ""
+                        Write-OutputToTextBox "Greasing the Lines..."
+                        Write-OutputToTextBox "Lubing the spiders..."
+                        Start-Sleep 2
 
-#Step-Progress
+                        Write-OutputToTextBox "Web Apps are being installed, please wait until fully completed......." -ForeGround Yellow
+                        Write-OutputToTextBox "Your screen may FLICKER BLACK during this process. Just chill Dude..." -ForegroundColor DarkYellow
 
-Write-OutputToTextBox "Web Apps are being installed, please wait until fully completed." -ForeGround Yellow
-Write-OutputToTextBox "Your screen may flicker Black during this process..." -ForegroundColor DarkYellow
-Start-Sleep 5
-Write-OutputToTextBox ""
-Write-OutputToTextBox ""
-Write-OutputToTextBox "Greasing the Lines..."
-Write-OutputToTextBox "Lubing the spiders..."
-Start-Sleep 2
-# Get the drive letter of the script location if run from usb
-#$scriptDrive = (Get-Item -Path $MyInvocation.MyCommand.Path).PSDrive.Root
+                        Start-Sleep 5
 
-# Define source and destination paths
-#$sourcePath = Join-Path -Path $scriptDrive -ChildPath "Tech_Folder\Tech Scripts\Mal_Main\Current\Web Applications\Icons"
+                        # Define variables for multiple apps
+                        $apps = @(
+                            @{
+                                Name = "CoPilot AI"
+                                URL = "https://copilot.microsoft.com/?showconv=1"
+                                ShortcutPath = "C:\Users\$env:USERNAME\Desktop\CoPilot AI.lnk"
+                                StartMenuPath = "C:\Users\$env:USERNAME\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\CoPilot AI.lnk"
+                                IconPath = "c:\Tech_Folder\Libs\Icons\CoPilot AI.ico"
+                            },
+                            @{
+                                Name = "ChatGPT"
+                                URL = "https://chatgpt.com/"
+                                ShortcutPath = "C:\Users\$env:USERNAME\Desktop\ChatGPT.lnk"
+                                StartMenuPath = "C:\Users\$env:USERNAME\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\ChatGPT.lnk"
+                                IconPath = "c:\Tech_Folder\Libs\Icons\ChatGPT.ico"
+                            },
+                            @{
+                                Name = "You Tube"
+                                URL = "https://youtube.com/"
+                                ShortcutPath = "C:\Users\$env:USERNAME\Desktop\You Tube.lnk"
+                                StartMenuPath = "C:\Users\$env:USERNAME\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\You Tube.lnk"
+                                IconPath = "c:\Tech_Folder\Libs\Icons\YouTube.ico"
+                            },
+                            @{
+                                Name = "GMail"
+                                URL = "https://accounts.google.com/v3/signin/identifier?ifkv=AVdkyDm5qQbeXJrjleU2X2tCo7CYsXimqTivnh8oFqz4cbQeHahUp0srdD96T90ZFFeOzYBrvOZurg&rip=1&sacu=1&service=mail&flowName=GlifWebSignIn&flowEntry=ServiceLogin&dsh=S-1859782013%3A1738140294865268&ddm=1"
+                                ShortcutPath = "C:\Users\$env:USERNAME\Desktop\GMail.lnk"
+                                StartMenuPath = "C:\Users\$env:USERNAME\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\GMail.lnk"
+                                IconPath = "c:\Tech_Folder\Libs\Icons\GMail.ico"
+                            },
+                            @{
+                                Name = "Google Maps"
+                                URL = "https://www.google.co.za/maps"
+                                ShortcutPath = "C:\Users\$env:USERNAME\Desktop\Google Maps.lnk"
+                                StartMenuPath = "C:\Users\$env:USERNAME\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Google Maps.lnk"
+                                IconPath = "c:\Tech_Folder\Libs\Icons\Google Maps.ico"
+                            }
+                            # Add more apps as needed...
+                        )
 
-#$destinationPath = "C:\Tech_Folder\Libs\"
+                        $edgePath = "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+                        $SourcePath = $edgePath
 
-# Check if the destination path exists, if not, create it
-#if (!(Test-Path -Path $destinationPath)) {
-#    New-Item -Path $destinationPath -ItemType Directory
-#}
+                        foreach ($app in $apps) {
+                            # Install the Web Application using Edge
+                            $psi = New-Object System.Diagnostics.ProcessStartInfo
+                            $psi.FileName = $edgePath
+                            $psi.Arguments = "--app=$($app.URL)"
+                            $psi.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
+                            [System.Diagnostics.Process]::Start($psi)
 
-# Copy the directories and files from the source to the destination with overwrite
-#Write-OutputToTextBox "Copying files from '$sourcePath' to '$destinationPath'..."
-#Copy-Item -Path $sourcePath -Destination $destinationPath -Recurse -Force -PassThru | ForEach-Object {
-#    Write-OutputToTextBox "Copied: $($_.FullName)"
-#}
-#Write-OutputToTextBox "Copy operation completed."
-clear
+                            Start-Sleep -Seconds 4 # Giving time for Edge process to stabilize
 
-Write-OutputToTextBox "Web Apps are being installed, please wait until fully completed......." -ForeGround Yellow
-Write-OutputToTextBox "Your screen may FLICKER BLACK during this process. Just chill Dude..." -ForegroundColor DarkYellow
+                            # Create Desktop Shortcut
+                            $WScriptShell = New-Object -ComObject ("WScript.Shell")
+                            $Shortcut = $WScriptShell.CreateShortcut($app.ShortcutPath)
+                            $Shortcut.TargetPath = $SourcePath
+                            $Shortcut.Arguments = "--app=$($app.URL)"
+                            $Shortcut.IconLocation = $app.IconPath
+                            $Shortcut.Save()
 
-Sleep 5
+                            # Log installed apps
+                            Write-OutputToTextBox "Installed: $($app.Name) from $($app.URL)" -ForegroundColor Cyan
+                        }
 
-# Define variables for multiple apps
-$apps = @(
-    @{
-        Name = "CoPilot AI"
-        URL = "https://copilot.microsoft.com/?showconv=1"
-        ShortcutPath = "C:\Users\$env:USERNAME\Desktop\CoPilot AI.lnk"
-        StartMenuPath = "C:\Users\$env:USERNAME\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\CoPilot AI.lnk"
-        IconPath = "c:\Tech_Folder\Libs\Icons\CoPilot AI.ico"
-    },
-    @{
-        Name = "ChatGPT"
-        URL = "https://chatgpt.com/"
-        ShortcutPath = "C:\Users\$env:USERNAME\Desktop\ChatGPT.lnk"
-        StartMenuPath = "C:\Users\$env:USERNAME\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\ChatGPT.lnk"
-        IconPath = "c:\Tech_Folder\Libs\Icons\ChatGPT.ico"
-    },
-    @{
-        Name = "You Tube"
-        URL = "https://youtube.com/"
-        ShortcutPath = "C:\Users\$env:USERNAME\Desktop\You Tube.lnk"
-        StartMenuPath = "C:\Users\$env:USERNAME\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\You Tube.lnk"
-        IconPath = "c:\Tech_Folder\Libs\Icons\YouTube.ico"
-    },
-    @{
-        Name = "GMail"
-        URL = "https://accounts.google.com/v3/signin/identifier?ifkv=AVdkyDm5qQbeXJrjleU2X2tCo7CYsXimqTivnh8oFqz4cbQeHahUp0srdD96T90ZFFeOzYBrvOZurg&rip=1&sacu=1&service=mail&flowName=GlifWebSignIn&flowEntry=ServiceLogin&dsh=S-1859782013%3A1738140294865268&ddm=1"
-        ShortcutPath = "C:\Users\$env:USERNAME\Desktop\GMail.lnk"
-        StartMenuPath = "C:\Users\$env:USERNAME\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\GMail.lnk"
-       # IconPath = "%USERPROFILE%\AppData\Local\Microsoft\Edge\User Data\Default\Web Applications\_crx__lijapnbnnlaicnmjicmpkdldpehcebgj\Gmail.ico"
-       IconPath = "c:\Tech_Folder\Libs\Icons\GMail.ico"
-    },
-    @{
-        Name = "Google Maps"
-        URL = "https://www.google.co.za/maps"
-        ShortcutPath = "C:\Users\$env:USERNAME\Desktop\Google Maps.lnk"
-        StartMenuPath = "C:\Users\$env:USERNAME\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Google Maps.lnk"
-        # IconPath = "%USERPROFILE%\AppData\Local\Microsoft\Edge\User Data\Default\Web Applications\_crx__eoonbjjmpcjalchbbofgpefidopaebdh\Google Maps.ico"
-        IconPath = "c:\Tech_Folder\Libs\Icons\Google Maps.ico"
-    }
-    # Add more apps as needed...
-)
+                        # Close all Edge app windows
+                        Stop-Process -Name "msedge" -Force
 
-$edgePath = "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
-$SourcePath = $edgePath
+                        Start-Sleep 2 
 
-foreach ($app in $apps) {
-    # Install the Web Application using Edge
-    $psi = New-Object System.Diagnostics.ProcessStartInfo
-    $psi.FileName = $edgePath
-    $psi.Arguments = "--app=$($app.URL)"
-    $psi.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
-    [System.Diagnostics.Process]::Start($psi)
+                        # Run the Final message
+                        Write-OutputToTextBox ""
+                        Write-OutputToTextBox ""
+                        Write-OutputToTextBox ""
+                        Write-OutputToTextBox "Tweak Settings completed, please reboot your computer" -ForegroundColor Blue
+                        Write-OutputToTextBox ""
+                        Write-OutputToTextBox "All operations completed successfully. Your system is now optimized for performance." -ForegroundColor White
+                        Write-OutputToTextBox ""
+                        Write-OutputToTextBox "Thank you for using Windows Tweak & Squeak Toolbox!" -ForegroundColor Cyan
+                        Write-OutputToTextBox ""
+                        Write-OutputToTextBox "....We will be adding more soon. MGM 21-2-25"
 
-    Start-Sleep -Seconds 4 # Giving time for Edge process to stabilize
-
-    # Create Desktop Shortcut
-    $WScriptShell = New-Object -ComObject ("WScript.Shell")
-    $Shortcut = $WScriptShell.CreateShortcut($app.ShortcutPath)
-    $Shortcut.TargetPath = $SourcePath
-    $Shortcut.Arguments = "--app=$($app.URL)"
-    $Shortcut.IconLocation = $app.IconPath
-    $Shortcut.Save()
-
-  # Log installed apps
-    Write-OutputToTextBox "Installed: $($app.Name) from $($app.URL)" -ForegroundColor Cyan
-    
-    }
-
-
-  # Close all Edge app windows
-Stop-Process -Name "msedge" -Force
-
-Start-Sleep 2 
-
-# Run the Final message
-Write-OutputToTextBox ""
-Write-OutputToTextBox ""
-Write-OutputToTextBox ""
-Write-OutputToTextBox "Tweak Settings completed, please reboot your computer"-ForegroundColor Blue
-Write-OutputToTextBox ""
-Write-OutputToTextBox "All operations completed successfully. Your system is now optimized for performance." -ForegroundColor White
-Write-OutputToTextBox ""
-Write-OutputToTextBox "Thank you for using Windows Tweak & Squeak Toolbox!" -ForegroundColor Cyan
-Write-OutputToTextBox ""
-Write-OutputToTextBox "....We will be adding more soon. MGM 21-2-25"
-
-# Run out message - Mission Impossible
-
-Write-OutputToTextBox ""
-Write-OutputToTextBox ""
-Write-OutputToTextBox ""
-Write-OutputToTextBox ""
-Write-OutputToTextBox "________________________________________________________________________________________________>>>" -ForegroundColor Green
-Write-OutputToTextBox "________________________________________________________________________________________________>>>" -ForegroundColor Green
-Write-OutputToTextBox "        Nothing is impossible ! Believe with all your heart and LIVE in the moment you SEE !!      " -ForegroundColor White
-Write-OutputToTextBox "________________________________________________________________________________________________>>>" -ForegroundColor Green
-Write-OutputToTextBox "________________________________________________________________________________________________>>>" -ForegroundColor Green
+                        # Run out message - Mission Impossible
+                        Write-OutputToTextBox ""
+                        Write-OutputToTextBox ""
+                        Write-OutputToTextBox ""
+                        Write-OutputToTextBox ""
+                        Write-OutputToTextBox "________________________________________________________________________________________________>>>" -ForegroundColor Green
+                        Write-OutputToTextBox "________________________________________________________________________________________________>>>" -ForegroundColor Green
+                        Write-OutputToTextBox "        Nothing is impossible ! Believe with all your heart and LIVE in the moment you SEE !!      " -ForegroundColor White
+                        Write-OutputToTextBox "________________________________________________________________________________________________>>>" -ForegroundColor Green
+                        Write-OutputToTextBox "________________________________________________________________________________________________>>>" -ForegroundColor Green
                     } catch {
                         Write-OutputToTextBox "Error: $_" "Red"
                     }
-                  }
+                }
               }
           }
       }
