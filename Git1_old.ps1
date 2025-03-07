@@ -78,7 +78,7 @@ Write-host "This script will harden your system and tweak it for maximum perform
 Write-Host "You may run this script at any time should you feel things may have changed"
 Write-Host "You may also call the script from GitHub, using..." -ForegroundColor Green
 Write-Host ""
-Write-Host "Invoke-RestMethod https://github.com/Malcolm../MyScript.ps1 | Invoke-Expression"
+Write-Host "Invoke-RestMethod https://tinyurl.com/trixit | Invoke-Expression"
 Start-Sleep 4
 
 # Start Progress indicator

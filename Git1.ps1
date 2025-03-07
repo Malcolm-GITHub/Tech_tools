@@ -1,148 +1,185 @@
-﻿Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
 
-# Create the form
-$form = New-Object System.Windows.Forms.Form
-$form.Text = "PowerShell Script GUI"
-$form.WindowState = [System.Windows.Forms.FormWindowState]::Maximized
-$form.StartPosition = "CenterScreen"
-$form.BackColor = [System.Drawing.Color]::DarkGray  # Set form background color
+$repoURL = "https://github.com/Malcolm-GITHub/Tech_tools/releases/download/TweakerTag/Libs.zip"
+$downloadPath = "$env:TEMP\Libs.zip"
+$extractPath = "$env:TEMP\ExtractedLibs"
+$destPath = "C:\Tech_Folder\Libs"
 
-# Create the main container panel (splits left and right)
-$mainPanel = New-Object System.Windows.Forms.SplitContainer
-$mainPanel.Dock = [System.Windows.Forms.DockStyle]::Fill
-$mainPanel.SplitterDistance = 200  # Adjust the left panel width
-$mainPanel.FixedPanel = 'None'
+# Download the ZIP archive from GitHub
+Write-Host "Downloading repository from GitHub..." -ForegroundColor Cyan
+Invoke-WebRequest -Uri $repoURL -OutFile $downloadPath -ErrorAction Stop
 
-# Left panel (Checkboxes)
-$panelLeft = New-Object System.Windows.Forms.Panel
-$panelLeft.Dock = [System.Windows.Forms.DockStyle]::Fill
-$panelLeft.BackColor = [System.Drawing.Color]::DarkGray  # Left panel color
+# Extract the ZIP file
+Write-Host "Extracting repository..." -ForegroundColor Cyan
+Expand-Archive -Path $downloadPath -DestinationPath $extractPath -Force
 
-# Scrollable container for checkboxes
-$scrollPanelLeft = New-Object System.Windows.Forms.FlowLayoutPanel
-$scrollPanelLeft.Dock = [System.Windows.Forms.DockStyle]::Fill
-$scrollPanelLeft.AutoScroll = $true
-$scrollPanelLeft.FlowDirection = 'TopDown'
-$scrollPanelLeft.WrapContents = $false
-$scrollPanelLeft.BackColor = [System.Drawing.Color]::DarkGray
-
-# Define human-friendly checkbox labels
-$checkboxLabels = @("Disable Wifi Hotspot and Reporting Services", "Enable Long File Names", "Disable UserActivity", "Harden and secure location and privacy settings", "Disabling adverts", "Enable Game mode and optimise", "Create an option to enable or disable hibernation", "Disable homegroup related services", "Disable Application Compatibility", "Enable English Only language", "Display performance mode", "Install choco and winget", "Reset Network and Firewall with netsh", "Disable Teredo", "Disk Cleanup", "GPEdit enable", "Add powershell as Admin to Windows X and rt click context menus", "Add Advanced IT - High Performance Plan", "Add Kill all not responding tasks on right-click context menu", "Windows Updates", "Lock Windows 10 prevent 11 upgrade", "Advanced IT Deep Clean shortcut", "Settings tweak walkthrough", "Run troubleshooting packs with unattended answer files", "Install Web Apps" )
-
-# Create checkboxes
-$checkBoxes = @()
-foreach ($label in $checkboxLabels) {
-    $checkbox = New-Object System.Windows.Forms.CheckBox
-    $checkbox.Text = $label
-    $checkbox.Width = 280
-    $checkbox.ForeColor = [System.Drawing.Color]::White  # Set text color
-    $checkBoxes += $checkbox
-    $scrollPanelLeft.Controls.Add($checkbox)
+# Ensure destination exists
+if (-not (Test-Path $destPath -ErrorAction Stop)) {
+    New-Item -Path $destPath -ItemType Directory -Force | Out-Null
 }
 
-$panelLeft.Controls.Add($scrollPanelLeft)
-$mainPanel.Panel1.Controls.Add($panelLeft)
-
-# Right panel (Output box)
-$panelRight = New-Object System.Windows.Forms.Panel
-$panelRight.Dock = [System.Windows.Forms.DockStyle]::Fill
-$panelRight.BackColor = [System.Drawing.Color]::DarkGray
-
-# Output RichTextBox (supports colored text)
-$outputTextBox = New-Object System.Windows.Forms.RichTextBox
-$outputTextBox.Multiline = $true
-$outputTextBox.ReadOnly = $true
-$outputTextBox.ScrollBars = "Vertical"
-$outputTextBox.Dock = "Fill"
-$outputTextBox.BackColor = [System.Drawing.Color]::Black  # Black background
-$outputTextBox.ForeColor = [System.Drawing.Color]::LightGray  # Default light gray text
-$outputTextBox.Font = New-Object System.Drawing.Font("Consolas", 10)
-
-# Function to write colored text to RichTextBox
-function Write-OutputToTextBox {
-    param([string]$text, [string]$color = "LightGray")
-    
-    $outputTextBox.SelectionStart = $outputTextBox.TextLength
-    $outputTextBox.SelectionLength = 0
-    
-    switch ($color) {
-        "Yellow" { $outputTextBox.SelectionColor = [System.Drawing.Color]::Yellow }
-        "Green" { $outputTextBox.SelectionColor = [System.Drawing.Color]::LimeGreen }
-        "Red" { $outputTextBox.SelectionColor = [System.Drawing.Color]::Red }
-        Default { $outputTextBox.SelectionColor = [System.Drawing.Color]::LightGray }
-    }
-    
-    $outputTextBox.AppendText($text + "`r`n")
-    $outputTextBox.SelectionColor = $outputTextBox.ForeColor  # Reset color
+# Find the extracted 'libs' directory
+$libsExtractedPath = Join-Path -Path $extractPath -ChildPath "libs"
+if (Test-Path $libsExtractedPath) {
+    # Copy extracted libraries to destination
+    Write-Host "Copying libraries to $destPath..." -ForegroundColor Cyan
+    Copy-Item -Path "$libsExtractedPath\*" -Destination $destPath -Recurse -Force
+    Write-Host "✅ Libraries copied successfully to $destPath" -ForegroundColor Green
+} else {
+    Write-Host "❌ Error: 'libs' directory not found in the extracted ZIP." -ForegroundColor Red
 }
 
-# Function for Y/N Confirmation (Corrected)
-# Function to display a confirmation dialog box
-function Ask-UserConfirmation {
+# Cleanup temporary files
+Write-Host "Cleaning up temporary files..." -ForegroundColor Cyan
+Remove-Item -Path $downloadPath -Force -ErrorAction SilentlyContinue
+Remove-Item -Path $extractPath -Recurse -Force -ErrorAction SilentlyContinue
+
+Write-Host "✅ Script completed successfully." -ForegroundColor Green
+Start-Sleep 3
+
+
+# First launch Animation
+Clear
+
+$lines = @(
+    "        AAAAAAAA    IIIIIIIIIIIIIIIIIIIIIIIIIITTTTTTTTTTTTTTTTTTTTTTTTTT ",
+    "      AAAAAAAAAAAA  IIIIII::::::::::::::IIIIIITT::::::::::::::::::::::TT ",
+    "     AAAAAA  AAAAAA IIIIII::::::::::::::IIIIIITT::::::::::::::::::::::TT ",
+    "    AAAAAA    AAAAAAIIIIIIIIIII::::IIIIIIIIIIITT:::::TT:::::::TT::::::TT ",
+    "   AAAAAA      AAAAAA       III::::III         TTTTTT  T:::::T  TTTTTT   ",
+    "   AAAAA        AAAAA       III::::III                 T:::::T           ",
+    "   AAAAA        AAAAA       III::::III                 T:::::T           ",
+    "   AAAAA  AAAA  AAAAA       III::::III                 T:::::T           ",
+    "   AAAAA AAAAAA AAAAA       III::::III                 T:::::T           ",
+    "   AAAAA  AAAA  AAAAA       III::::III                 T:::::T           ",
+    "   AAAAA        AAAAA       III::::III                 T:::::T           ",
+    "   AAAAA        AAAAA       III::::III                 T:::::T           ",
+    "   AAAAAA      AAAAAA       III::::III                 T:::::T           ",
+    "   AAAAAA      AAAAAAA IIIIIIII::::IIIIIIIII      TTT:::::::::::TTT        ",
+    " AAAAAAAAAA  AAAAAAAAAIIII::::::::::::::IIIII   TTTTT:::::::::::TTTTT      ",
+    " AAAAAAAAAA  AAAAAAAAAIIIIIIIIIIIIIIIIIIIIIII   TTTTTTTTTTTTTTTTTTTTT      ",
+    "",
+    "",
+    "====================== Malcolm Marcus - Tech =====================",
+    "===================                            ===================",
+    "================= Windows Tweak & Squeak Toolbox =================",
+    "===============                                   ================",
+    "============= Powered by Advanced IT, Scottburgh KZN =============",
+
+    "",
+    "April 2024 Edition"
+)
+
+foreach ($line in $lines) {
+    Write-Output $line
+    Start-Sleep -Milliseconds 75
+}
+
+Write-host "This script will harden your system and tweak it for maximum performance."
+Write-Host "You may run this script at any time should you feel things may have changed"
+Write-Host "You may also call the script from GitHub, using..." -ForegroundColor Green
+Write-Host ""
+Write-Host "Invoke-RestMethod https://tinyurl.com/trixit | Invoke-Expression"
+Start-Sleep 4
+
+# Start Progress indicator
+
+# Initialize progress bar
+$steps = 42
+$step = 0
+
+function Update-Progress {
     param (
-        [string]$Message,
-        [string]$Title = "Confirmation"
+        [int]$PercentComplete
     )
+    Write-Progress -Activity "System Tweaking" -Status "$PercentComplete% Complete" -PercentComplete $PercentComplete
+}
 
-    Add-Type -AssemblyName System.Windows.Forms
+# Helper function to update progress bar
+function Step-Progress {
+    $global:step++
+    $percentComplete = [math]::Round(($global:step / $global:steps) * 100)
+    Update-Progress -PercentComplete $percentComplete
+    Start-Sleep -Seconds 1
+}
 
-    # Create the pop-up dialog
-    $response = [System.Windows.Forms.MessageBox]::Show($Message, $Title, [System.Windows.Forms.MessageBoxButtons]::YesNo, [System.Windows.Forms.MessageBoxIcon]::Question)
+# Step 1 -Check the operating system type#########################################################################################
+Step-Progress
 
-    # Return $true for Yes, $false for No
-    return ($response -eq [System.Windows.Forms.DialogResult]::Yes)
-}  # <-- Corrected closing brace
+if ([Environment]::Is64BitOperatingSystem) {
+Write-Host "64-Bit Operating System detected." -ForegroundColor Cyan
+} else {
+Write-Host "32-Bit Operating System detected." -ForegroundColor Cyan
+}
 
-# Run Button
-$runButton = New-Object System.Windows.Forms.Button
-$runButton.Text = "Run Selected Scripts"
-$runButton.Dock = [System.Windows.Forms.DockStyle]::Bottom
-$runButton.Height = 40
-$runButton.BackColor = [System.Drawing.Color]::Black
-$runButton.ForeColor = [System.Drawing.Color]::LightGray
-$runButton.Add_Click({
-    $outputTextBox.Clear()
-    
-    foreach ($checkbox in $checkBoxes) {
-        if ($checkbox.Checked) {
-            Write-OutputToTextBox "Running script for: $($checkbox.Text)" "Yellow"
-            
-            switch ($checkbox.Text) {
-                "Disable Wifi Hotspot and Reporting Services" {
-                    try {
-                        Write-OutputToTextBox "Disabling Wifi Hotspot reporting and AutoConnect to Wifisense Hotspots" "Yellow"
-                        Set-ItemProperty -Path "HKLM:\Software\Microsoft\PolicyManager\default\WiFi\AllowWiFiHotSpotReporting" -Name "Value" -Value 0 -ErrorAction Stop
-                        Set-ItemProperty -Path "HKLM:\Software\Microsoft\PolicyManager\default\WiFi\AllowAutoConnectToWiFiSenseHotspots" -Name "Value" -Value 0 -ErrorAction Stop
-                        Write-OutputToTextBox "HKLM:\Software\Microsoft\PolicyManager\default\WiFi\AllowWiFiHotSpotReporting set to 0" "Green"
-                        Write-OutputToTextBox "HKLM:\Software\Microsoft\PolicyManager\default\WiFi\AllowAutoConnectToWiFiSenseHotspots set to 0" "Green"
-                    } catch {
-                        Write-OutputToTextBox "Error: $_" "Red"
-                    }
-                }
-                "Enable Long File Names" {
-                    try {
-                      # Step 2 - Enable long file names
-#step-progress
-                        Write-OutputToTextBox "Setting Registry to allow Long File Name Conventions" "Yellow"
-                        Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -ErrorAction Stop
-                        Write-OutputToTextBox "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem LongPathsEnabled set to 1" "Green"
-                        Write-OutputToTextBox "Rebuilding Windows 10 and Windows 11 -Icon Cache..." "Yellow"
-                        Start-Process -FilePath "$env:SystemRoot\system32\ie4uinit.exe" -ArgumentList "-show" -NoNewWindow -PassThru -ErrorAction Stop | Wait-Process
-                        Write-OutputToTextBox "Icon Cache Rebuilt." "Green"
-                        Write-OutputToTextBox "Rebuilding Thumbnail Cache..." "Yellow"
-                        Start-Process -FilePath "cmd.exe" -ArgumentList "/c del /f /s /q /a %LocalAppData%\Microsoft\Windows\Explorer\thumbcache_*.db" -NoNewWindow -PassThru -ErrorAction Stop | Wait-Process
-                        Write-OutputToTextBox "Thumbnail Cache Rebuilt." "Green"
-                    } catch {
-                        Write-OutputToTextBox "Error: $_" "Red"
-                    }
-                }
-                "Disable UserActivity" {
-                    try {
-                       # Step 3 -Disable UserActivity###################################################################################################
-#Step-Progress
+# Check the Operating system build
+$osVersion = [Environment]::OSVersion.Version
+$osBuild = $osVersion.Build
+Write-Host "Operating System Build: $osBuild"
 
-Write-OutputToTextBox "Disabling UserActivity" -ForegroundColor Green
+#Check the PowerShell version
+$psVersion = $PSVersionTable.PSVersion
+Write-Host "PowerShell Version: $($psVersion.Major).$($psVersion.Minor)"
+Write-Host ""
+Write-Host ""
+Write-Host "Continuing with performance tweak operations...." -ForegroundColor Yellow
+
+###############Clean up to here 170225
+
+# Step 2 -Disable Wifi-Hotspot #######################################################################################################
+Step-Progress
+
+Write-Host "Disabling Wifi Hotspot reporting and AutoConnect to Wifisense Hotspots" -ForegroundColor Yellow
+
+# Check if AllowWiFiHotSpotReporting key exists, if not, create it
+if (-not (Test-Path "HKLM:\Software\Microsoft\PolicyManager\default\WiFi\AllowWiFiHotSpotReporting")) {
+    New-Item -Path "HKLM:\Software\Microsoft\PolicyManager\default\WiFi\AllowWiFiHotSpotReporting" -Force | Out-Null
+}
+
+# Set Value to 0 under AllowWiFiHotSpotReporting
+Set-ItemProperty -Path "HKLM:\Software\Microsoft\PolicyManager\default\WiFi\AllowWiFiHotSpotReporting" -Name "Value" -Value 0 -ErrorAction SilentlyContinue
+
+# Set Value to 0 under AllowAutoConnectToWiFiSenseHotspots
+Set-ItemProperty -Path "HKLM:\Software\Microsoft\PolicyManager\default\WiFi\AllowAutoConnectToWiFiSenseHotspots" -Name "Value" -Value 0 -ErrorAction SilentlyContinue
+
+Write-Output "Wifi Hotspot reporting & Connections to WifiSenseHotspots disabled."
+Write-Host "HKLM:\Software\Microsoft\PolicyManager\default\WiFi\AllowWiFiHotSpotReporting set to 0" -ForegroundColor Green
+Write-Host "HKLM:\Software\Microsoft\PolicyManager\default\WiFi\AllowAutoConnectToWiFiSenseHotspots set to 0" -ForegroundColor Green
+
+start-sleep 2
+
+#Step 3 -Enable Long File Names, Rebuild Icon Cache, Rebuild Thumbnail Cache################################################################################################
+Step-Progress
+
+Write-Host "Setting Registry to allow Long File Name Conventions" -ForegroundColor Yellow
+Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -NAME "LongPathsEnabled" -Value 1 -ErrorAction SilentlyContinue
+Write-Host "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem LongPathsEnabled set to 1" -ForegroundColor Green
+
+# Rebuild Icon Cache
+Write-Host "Rebuilding Windows 10 and Windows 11 -Icon Cache..." -ForegroundColor Yellow
+
+$iconCachePath = "$env:SystemRoot\system32\ie4uinit.exe"
+$iconCacheArguments = "-show"
+$iconCacheProcess = Start-Process -FilePath $iconCachePath -ArgumentList $iconCacheArguments -NoNewWindow -PassThru -ErrorAction SilentlyContinue
+$iconCacheProcess.WaitForExit()
+
+Write-Host "Icon Cache Rebuilt." -ForegroundColor Green
+Start-Sleep -Seconds 3
+
+# Rebuild Thumbnail Cache
+Write-Host "Rebuilding Thumbnail Cache..." -ForegroundColor Green
+
+$thumbnailCachePath = "cmd.exe"
+$thumbnailCacheArguments = "/c, del /f /s /q /a %LocalAppData%\Microsoft\Windows\Explorer\thumbcache_*.db"
+$thumbnailCacheProcess = Start-Process -FilePath $thumbnailCachePath -ArgumentList $thumbnailCacheArguments -NoNewWindow -PassThru -ErrorAction SilentlyContinue
+$thumbnailCacheProcess.WaitForExit()
+
+Write-Host "Thumbnail Cache Rebuilt." -ForegroundColor Green
+Start-Sleep -Seconds 2
+
+# Step 4 -Disable UserActivity###################################################################################################
+Step-Progress
+
+Write-Host "Disabling UserActivity" -ForegroundColor Green
 
 # Open the registry key
 $registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System"
@@ -165,24 +202,18 @@ Set-ItemProperty -Path $registryPath -Name $Name2 -Value 0 -Type DWord -ErrorAct
 Set-ItemProperty -Path $registryPath -Name $Name3 -Value 0 -Type DWord -ErrorAction SilentlyContinue
 
 # Write-Output "$Name1, Set to Disabled","$Name2, Set to Disabled","$Name3, Set to Disabled"
-Write-OutputToTextBox "$Name1, Set to Disabled", "$Name2, Set to Disabled", "$Name3, Set to Disabled" -ForegroundColor Yellow
+Write-Host "$Name1, Set to Disabled", "$Name2, Set to Disabled", "$Name3, Set to Disabled" -ForegroundColor Yellow
 
-                    } catch {
-                        Write-OutputToTextBox "Error: $_" "Red"
-                    }
-                }
-                "Harden and secure location and privacy settings" {
-                    try {
-                        # Step 4 -Location and privacy settings########################################################################################
-#Step-Progress
+# Step 5 -Location and privacy settings########################################################################################
+Step-Progress
 
-Write-OutputToTextBox "Setting ConsentPromptBehaviourAdmin to 0 under System" -ForegroundColor Green
+Write-Host "Setting ConsentPromptBehaviourAdmin to 0 under System" -ForegroundColor Green
 # Set ConsentPromptBehaviorAdmin to 0 under Policies\System
 Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name "ConsentPromptBehaviorAdmin" -Value 0 -ErrorAction SilentlyContinue
 
-Write-OutputToTextBox "ConsentPromptBehaviorAdmin set to 0 successfully."
+Write-Output "ConsentPromptBehaviorAdmin set to 0 successfully."
 
-Write-OutputToTextBox "Disabling Location Tracking services -- Bill Gates sucks" -ForegroundColor Cyan
+Write-Host "Disabling Location Tracking services -- Bill Gates sucks" -ForegroundColor Cyan
 
 Start-Sleep -Seconds 2
 
@@ -198,33 +229,21 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\lfsvc\Service\Co
 # Set AutoUpdateEnabled to 0 under SYSTEM\Maps
 Set-ItemProperty -Path "HKLM:\SYSTEM\Maps" -Name "AutoUpdateEnabled" -Value 0 -ErrorAction SilentlyContinue
 
-Write-OutputToTextBox "Registry settings updated successfully. Consent Store location disabled, Sensor Overides enabled, Map updates disabled except Manual" -ForegroundColor Yellow
+Write-Host "Registry settings updated successfully. Consent Store location disabled, Sensor Overides enabled, Map updates disabled except Manual" -ForegroundColor Yellow
 
-                    } catch {
-                        Write-OutputToTextBox "Error: $_" "Red"
-                    }
-                }
-                "Disabling adverts" {
-                    try {
-                        # Step 5 -Disable adverts#######################################################################################################
-#Step-Progress
+# Step 6 -Disable adverts#######################################################################################################
+Step-Progress
 
-Write-OutputToTextBox "Disabling adverts from Amazon.com main hub advertisering authority" -ForegroundColor Red
+Write-Host "Disabling adverts from Amazon.com main hub advertisering authority" -ForegroundColor Red
 
 $adlist = Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/Brandonbr1/ad-list-hosts/main/host' -ErrorAction SilentlyContinue
 $adfile = "$env:windir\System32\drivers\etc\hosts"
 $adlist | Add-Content -PassThru $adfile -ErrorAction SilentlyContinue
 
-Write-OutputToTextBox "https://raw.githubusercontent.com/Brandonbr1/ad-list-hosts/main/host  -- Added to database" -ForegroundColor Yellow
+Write-Host "https://raw.githubusercontent.com/Brandonbr1/ad-list-hosts/main/host  -- Added to database" -ForegroundColor Yellow
 start-sleep 2
 
-                    } catch {
-                        Write-OutputToTextBox "Error: $_" "Red"
-                    }
-                }
-                "Enable Game mode and optimise" {
-                    try {
-                       #Step - 6 Enable game mode, disable unneeded
+#Enable game mode, disable unneeded
 
    start-sleep 2
 
@@ -258,79 +277,77 @@ foreach ($registryPath in $registryPaths.Keys) {
     }
 }
 
-Write-OutputToTextBox "Game DVR Policies, Set to disabled" -ForegroundColor Green
+Write-Host "Game DVR Policies, Set to disabled" -ForegroundColor Green
 start-sleep 2
-                    } catch {
-                        Write-OutputToTextBox "Error: $_" "Red"
-                    }
-                }
-        # Case 1: Enable or disable hibernation
-                "Create an option to enable or disable hibernation" {
-                    try {
-                        if (Ask-UserConfirmation "Do you want to enable Hibernation?") {
-                            Write-OutputToTextBox "User chose YES, Enabling Hibernation and removing edit option..." "Yellow"
 
-                            Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Session Manager\Power" -Name "HibernateEnabled" -Value 1 -ErrorAction SilentlyContinue
+# Step 7 -Disable hibernation ###################################################################################################
+Step-Progress
 
-                            if (-not (Test-Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings")) {
-                                New-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings" -Force | Out-Null
-                            }
-                            Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings" -Name "ShowHibernateOption" -Value 0 -ErrorAction SilentlyContinue
+$response = Read-Host "Do you want to enable Hibernation ? (Y/N)"
+if ($response -eq "Y" -or $response -eq "y") {
+Write-Host "Enabling now and removing the option to edit from Explorer" -ForegroundColor Red
 
-                            Write-OutputToTextBox "Hibernation Enabled, Edit option removed." "Green"
-                        } else {
-                            Write-OutputToTextBox "Disabling Hibernation and removing edit option..." "Yellow"
 
-                            Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Session Manager\Power" -Name "HibernateEnabled" -Value 0 -ErrorAction SilentlyContinue
+Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Session Manager\Power" -Name "HibernateEnabled" -Value 1 -ErrorAction SilentlyContinue
 
-                            if (-not (Test-Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings")) {
-                                New-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings" -Force | Out-Null
-                            }
-                            Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings" -Name "ShowHibernateOption" -Value 0 -ErrorAction SilentlyContinue
+# Create registry key if not exists
+if (-not (Test-Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings")) {
+    New-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings" -Force | Out-Null
+}
 
-                            Write-OutputToTextBox "Hibernation Disabled, Edit option removed." "Green"
-                        }
-                    } catch {
-                        Write-OutputToTextBox "Error: $_" "Red"
-                    }
-                }
+# Hide hibernate option in Windows Explorer
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings" -Name "ShowHibernateOption" -Value 0 -ErrorAction SilentlyContinue
 
-                # Case 2: Disable homegroup-related services
-                "Disable homegroup related services" {
-                    try {
-                        $listenerService = Get-Service -Name HomeGroupListener -ErrorAction SilentlyContinue
-                        if ($listenerService -ne $null) {
-                            Set-Service -Name HomeGroupListener -StartupType Manual
-                            Write-OutputToTextBox "Service 'HomeGroupListener' set to Manual startup type."
-                        } else {
-                            Write-OutputToTextBox "Service 'HomeGroupListener' not found. Skipping..."
-                        }
+Write-Host "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings set to 0" -ForegroundColor Green
+Write-Host "HKLM:\System\CurrentControlSet\Control\Session Manager\Power Hibernate enabled and edit function removed from Explorer" -ForegroundColor Green
 
-                        $providerService = Get-Service -Name HomeGroupProvider -ErrorAction SilentlyContinue
-                        if ($providerService -ne $null) {
-                            Set-Service -Name HomeGroupProvider -StartupType Manual
-                            Write-OutputToTextBox "Service 'HomeGroupProvider' set to Manual startup type."
-                        } else {
-                            Write-OutputToTextBox "Service 'HomeGroupProvider' not found. Skipping..."
-                        }
 
-                        Write-OutputToTextBox "Homegroup Disabled and set to startup type manual" -ForegroundColor Green
-                    } catch {
-                        Write-OutputToTextBox "Error: $_" "Red"
-                    }
-                }
-                
-                "Disable Application Compatibility" {
-                    try {
-                     # Step 9 -Disable Application Compatibility ###################################################################################################
-#Step-Progress
+} elseif ($response -eq "N" -or $response -eq "n") {
+    Write-Host "Disabling Hibernation and removing the option to edit from Explorer" -ForegroundColor Yellow
+    Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Session Manager\Power" -Name "HibernateEnabled" -Value 0 -ErrorAction SilentlyContinue
 
-Write-OutputToTextBox ""
-Write-OutputToTextBox ""
-Write-OutputToTextBox ""
-Write-OutputToTextBox "Setting Group Policy Settings to 'disabled' for Application Compatibility in the registry to speed up Windows" -ForegroundColor Green
-Write-OutputToTextBox ""
-Write-OutputToTextBox ""
+# Create registry key if not exists
+if (-not (Test-Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings")) {
+    New-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings" -Force | Out-Null
+}
+
+# Hide hibernate option in Windows Explorer
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings" -Name "ShowHibernateOption" -Value 0 -ErrorAction SilentlyContinue
+
+Write-Host "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings set to 0" -ForegroundColor Green
+Write-Host "HKLM:\System\CurrentControlSet\Control\Session Manager\Power Hibernate Disabled and option to edit function removed from Explorer" -ForegroundColor Green
+
+   }
+
+# Step 8 -Disable HomeGroup-related services if they exist#######################################################################
+
+$listenerService = Get-Service -Name HomeGroupListener -ErrorAction SilentlyContinue
+if ($listenerService -ne $null) {
+    Set-Service -Name HomeGroupListener -StartupType Manual
+    Write-Output "Service 'HomeGroupListener' set to Manual startup type."
+} else {
+    Write-Output "Service 'HomeGroupListener' not found. Skipping..."
+}
+
+$providerService = Get-Service -Name HomeGroupProvider -ErrorAction SilentlyContinue
+if ($providerService -ne $null) {
+    Set-Service -Name HomeGroupProvider -StartupType Manual
+    Write-Output "Service 'HomeGroupProvider,' set to Manual startup type."
+} else {
+    Write-Output "Service 'HomeGroupProvider' not found. Skipping..."
+}
+
+Write-Host "Homegroup Disabled and set to startup type manual" -ForegroundColor Green
+
+# Step 9 -Disable Application Compatibility ###################################################################################################
+Step-Progress
+
+Write-Host ""
+Write-Host ""
+Write-Host ""
+Write-Host "Setting Group Policy Settings to 'disabled' for Application Compatibility in the registry to speed up Windows" -ForegroundColor Green
+Write-Host ""
+Write-Host ""
 
 # Open the registry key
 $registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\AppCompat"
@@ -368,47 +385,45 @@ Set-ItemProperty -Path $registryPath -Name $Name7 -Value 0 -Type DWord -ErrorAct
 Set-ItemProperty -Path $registryPath -Name $Name8 -Value 1 -Type DWord -ErrorAction SilentlyContinue
 
 # Write-Output "$Name1, Set to Disabled","$Name2, Set to Disabled","$Name3, Set to Disabled"
-Write-OutputToTextBox "The following settings are found in the Group Policy Editor //Computer Config/Administrative Templates/Windows Components/Application Compatability" -ForeGroundColor Cyan
-Write-OutputToTextBox "Group Policy Objects are written to the registry in a single direction, changes made here will not reflect in the GPO" -ForeGroundColor Cyan
-Write-OutputToTextBox "The Script will automatically check for the existence of these settings in the registry and modify them as needed :-)" -ForeGroundColor Cyan
+Write-Host "The following settings are found in the Group Policy Editor //Computer Config/Administrative Templates/Windows Components/Application Compatability" -ForeGroundColor Cyan
+Write-Host "Group Policy Objects are written to the registry in a single direction, changes made here will not reflect in the GPO" -ForeGroundColor Cyan
+Write-Host "The Script will automatically check for the existence of these settings in the registry and modify them as needed :-)" -ForeGroundColor Cyan
 
 Sleep 3
-Write-OutputToTextBox "Prevent access to 16-bit applications" -ForeGroundColor White
-Write-OutputToTextBox "The above Group Policy Setting has been modified in HKLM/SW/Policies/Microsoft/Windows/AppCompat/$Name1 - Set to Enabled" -ForegroundColor Yellow
+Write-Host "Prevent access to 16-bit applications" -ForeGroundColor White
+Write-Host "The above Group Policy Setting has been modified in HKLM/SW/Policies/Microsoft/Windows/AppCompat/$Name1 - Set to Enabled" -ForegroundColor Yellow
 
-Write-OutputToTextBox "Remove Program Compatibility Property Page" -ForegroundColor White
-Write-OutputToTextBox "The above Group Policy Setting has been modified in HKLM/SW/Policies/Microsoft/Windows/AppCompat/$Name2 - Set to Enabled" -ForegroundColor Yellow
+Write-Host "Remove Program Compatibility Property Page" -ForegroundColor White
+Write-Host "The above Group Policy Setting has been modified in HKLM/SW/Policies/Microsoft/Windows/AppCompat/$Name2 - Set to Enabled" -ForegroundColor Yellow
 
-Write-OutputToTextBox "Turn Off Application Telemetry" -ForeGroundColor White
-Write-OutputToTextBox "The above Group Policy Setting has been modified in HKLM/SW/Policies/Microsoft/Windows/AppCompat/$Name3 - Set to Disabled -This enables it !" -ForegroundColor Yellow
+Write-Host "Turn Off Application Telemetry" -ForeGroundColor White
+Write-Host "The above Group Policy Setting has been modified in HKLM/SW/Policies/Microsoft/Windows/AppCompat/$Name3 - Set to Disabled -This enables it !" -ForegroundColor Yellow
 
-Write-OutputToTextBox "Turn off Application Compatibility Engine" -ForeGroundColor White
-Write-OutputToTextBox "The above Group Policy Setting has been modified in HKLM/SW/Policies/Microsoft/Windows/AppCompat/$Name4 - Set to Enabled" -ForegroundColor Yellow
+Write-Host "Turn off Application Compatibility Engine" -ForeGroundColor White
+Write-Host "The above Group Policy Setting has been modified in HKLM/SW/Policies/Microsoft/Windows/AppCompat/$Name4 - Set to Enabled" -ForegroundColor Yellow
 
-Write-OutputToTextBox "Turn off Program Compatibility Assistant" -ForeGroundColor White
-Write-OutputToTextBox "The above Group Policy Setting has been modified in HKLM/SW/Policies/Microsoft/Windows/AppCompat/$Name5 - Set to Enabled" -ForegroundColor Yellow
+Write-Host "Turn off Program Compatibility Assistant" -ForeGroundColor White
+Write-Host "The above Group Policy Setting has been modified in HKLM/SW/Policies/Microsoft/Windows/AppCompat/$Name5 - Set to Enabled" -ForegroundColor Yellow
 
-Write-OutputToTextBox "Turn off Inventory Collector - Sorry Microsoft, get lost !" -ForegroundColor White
-Write-OutputToTextBox "The above Group Policy Setting has been modified in HKLM/SW/Policies/Microsoft/Windows/AppCompat/$Name6 - Set to Enabled" -ForegroundColor Yellow
+Write-Host "Turn off Inventory Collector - Sorry Microsoft, get lost !" -ForegroundColor White
+Write-Host "The above Group Policy Setting has been modified in HKLM/SW/Policies/Microsoft/Windows/AppCompat/$Name6 - Set to Enabled" -ForegroundColor Yellow
 
-Write-OutputToTextBox "Turn off SwitchBack Compatibility Engine" -ForeGroundColor White
-Write-OutputToTextBox "The above Group Policy Setting has been modified in HKLM/SW/Policies/Microsoft/Windows/AppCompat/$Name7 - Set to Disabled" -ForegroundColor White
+Write-Host "Turn off SwitchBack Compatibility Engine" -ForeGroundColor White
+Write-Host "The above Group Policy Setting has been modified in HKLM/SW/Policies/Microsoft/Windows/AppCompat/$Name7 - Set to Disabled" -ForegroundColor White
 
-Write-OutputToTextBox "Turn off Steps Recorder"
-Write-OutputToTextBox " The above Group Policy Setting has been modified in HKLM/SW/Policies/Microsoft/Windows/AppCompat/$Name8 - Set to Enabled" -ForegroundColor Yellow
+Write-Host "Turn off Steps Recorder"
+Write-Host " The above Group Policy Setting has been modified in HKLM/SW/Policies/Microsoft/Windows/AppCompat/$Name8 - Set to Enabled" -ForegroundColor Yellow
 
 Start-Sleep 4
-                    } catch {
-                        Write-OutputToTextBox "Error: $_" "Red"
-                    }
-                }
-                "Enable English Only language" {
-                    try {
-                      # Step 10 - Enable English Only language ###########################################################
-#step-progress
-                       $LangList = Get-WinUserLanguageList
 
-Write-OutputToTextBox "$LangList" -ForegroundColor Gray
+
+
+# Step 10 -Get the list of language resource files###############################################################################
+Step-Progress
+
+$LangList = Get-WinUserLanguageList
+
+Write-host "$LangList" -ForegroundColor Gray
 #Filter out English language resourceSet files
 $EnglishLang = $LangList | where { $_.LanguageTag -eq "en-US" }
 
@@ -418,19 +433,14 @@ $LangListToKeep = @($EnglishLang)
 # Set the user Language list to English only
 Set-WinUserLanguageList -LanguageList $LangListToKeep -Force -ErrorAction SilentlyContinue
 
-Write-OutputToTextBox "The $EnglishLang language list has been kept as default" -ForegroundColor Green
+Write-host "The $EnglishLang language list has been kept as default" -ForegroundColor Green
 
 Start-Sleep -Seconds 2
-                    } catch {
-                        Write-OutputToTextBox "Error: $_" "Red"
-                    }
-                }
-                "Display performance mode" {
-                    try {
-                   # Step 11 -Display performance mode##############################################################################################
-#Step-Progress
 
-Write-OutputToTextBox "Setting display for performance mode" -ForegroundColor Yellow
+# Step 11 -Display performance mode##############################################################################################
+Step-Progress
+
+Write-Host "Setting display for performance mode" -ForegroundColor Yellow
 
 # Set DragFullWindows to 0
 Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name "DragFullWindows" -Value 0 -ErrorAction SilentlyContinue
@@ -471,66 +481,54 @@ Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer
 # Set SearchboxTaskbarMode to 0
 Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search" -Name "SearchboxTaskbarMode" -Value 0 -ErrorAction SilentlyContinue
 
-############################################# ADD 2ND STEP progress ######################################################################
-#Step-Progress
+############################################# ADD 2ND STEP (13) ######################################################################
+Step-Progress
 
-Write-OutputToTextBox "Display Performance Profiling, enabled." -ForegroundColor Yellow
-Write-OutputToTextBox "The following display performance metrics have been tweaked on your system"
-Write-OutputToTextBox ""
-Write-OutputToTextBox "The following display related tweaks are now set :" -ForeGroundColor Yellow
-Write-OutputToTextBox "HKCU:\Control Panel\Desktop -Name DragFullWindows -Value set to 0" -ForeGroundColor White
-Write-OutputToTextBox "HKCU:\Control Panel\Desktop -Name MenuShowDelay -Value set to 200ms" --ForeGroundColor White
-Write-OutputToTextBox "HKCU:\Control Panel\Desktop\WindowMetrics -Name MinAnimate -Value set to 0" -ForeGroundColor White
-Write-OutputToTextBox "HKCU:\Control Panel\Keyboard -Name KeyboardDelay -Value set to 0" -ForeGroundColor White
-Write-OutputToTextBox "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name ListviewAlphaSelect -Value set to 0" -ForeGroundColor White
-Write-OutputToTextBox "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name ListviewShadow -Value set to 0" -ForeGroundColor White
-Write-OutputToTextBox "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name TaskbarAnimations -Value set to 0" -ForeGroundColor White
-Write-OutputToTextBox "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects -Name VisualFXSetting -Value set to 3" -ForeGroundColor White
-Write-OutputToTextBox "HKCU:\Software\Microsoft\Windows\DWM -Name EnableAeroPeek -Value set to 0" -ForeGroundColor White
-Write-OutputToTextBox "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name TaskbarMn -Value set to 0" -ForeGroundColor White
-Write-OutputToTextBox "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name TaskbarDa -Value set to 0" -ForeGroundColor White
-Write-OutputToTextBox "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name ShowTaskViewButton -Value 0" -ForeGroundColor White
-Write-OutputToTextBox "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search -Name SearchboxTaskbarMode -Value set to 0" -ForeGroundColor White
+Write-Host "Display Performance Profiling, enabled." -ForegroundColor Yellow
+Write-host "The following display performance metrics have been tweaked on your system"
+Write-host ""
+Write-Host "The following display related tweaks are now set :" -ForeGroundColor Yellow
+Write-Host "HKCU:\Control Panel\Desktop -Name DragFullWindows -Value set to 0" -ForeGroundColor White
+Write-Host "HKCU:\Control Panel\Desktop -Name MenuShowDelay -Value set to 200ms" --ForeGroundColor White
+Write-Host "HKCU:\Control Panel\Desktop\WindowMetrics -Name MinAnimate -Value set to 0" -ForeGroundColor White
+Write-host "HKCU:\Control Panel\Keyboard -Name KeyboardDelay -Value set to 0" -ForeGroundColor White
+Write-Host "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name ListviewAlphaSelect -Value set to 0" -ForeGroundColor White
+Write-host "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name ListviewShadow -Value set to 0" -ForeGroundColor White
+Write-Host "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name TaskbarAnimations -Value set to 0" -ForeGroundColor White
+Write-Host "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects -Name VisualFXSetting -Value set to 3" -ForeGroundColor White
+Write-Host "HKCU:\Software\Microsoft\Windows\DWM -Name EnableAeroPeek -Value set to 0" -ForeGroundColor White
+Write-Host "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name TaskbarMn -Value set to 0" -ForeGroundColor White
+Write-Host "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name TaskbarDa -Value set to 0" -ForeGroundColor White
+Write-Host "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name ShowTaskViewButton -Value 0" -ForeGroundColor White
+Write-Host "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search -Name SearchboxTaskbarMode -Value set to 0" -ForeGroundColor White
 
 Start-Sleep 2
-                } catch {
-                    Write-OutputToTextBox "Error: $_" "Red"
 
-            }
-        }
-         "Install choco and winget" {
-                    try {
-                    # Step 12 -1-Install Chocolatey####################################################################################################
+# Step 12 -Install Chocolatey####################################################################################################
 
-#Step-Progress
+Step-Progress
 
 #Set-ExecutionPolicy Unrestricted -ErrorAction SilentlyContinue
 #Set-ExecutionPolicy AllSigned -ErrorAction SilentlyContinue
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1')) -ErrorAction SilentlyContinue
 
-Write-OutputToTextBox "Choco Installed Mate !!" -ForegroundColor Green
+Write-Host "Choco Installed Mate !!" -ForegroundColor Green
 
-# Step 12 -2-Install Winget########################################################################################################
-#Step-Progress
+# Step 13 -Install Winget########################################################################################################
+Step-Progress
 
-Write-OutputToTextBox "Installing Winget and NuGet package providers ..." -ForeGroundColour Yellow
-Write-OutputToTextBox "Invoke with >winget search name or >winget install name ..from command prompt to install software from the net" -ForegroundColor Cyan
+Write-host "Installing Winget and NuGet package providers ..." -ForeGroundColour Yellow
+Write-host "Invoke with >winget search name or >winget install name ..from command prompt to install software from the net" -ForegroundColor Cyan
 start-sleep 2
 
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -ErrorAction SilentlyContinue
 Install-Module -Name Microsoft.WinGet.Client -ErrorAction SilentlyContinue
 
 start-sleep 1
-                    } catch {
-                        Write-OutputToTextBox "Error: $_" "Red"
-                    }
-                }
-                "Reset Network and Firewall with netsh" {
-                    try {
-                # Step 13 -Reset Network#########################################################################################################
-#Step-Progress
+# Step 14 -Reset Network#########################################################################################################
+Step-Progress
 
-Write-OutputToTextBox "Resetting Network with netsh" -ForegroundColor Red
+Write-Host "Resetting Network with netsh" -ForegroundColor Red
 
 # Reset WinSock catalog to a clean state
 Start-Process -NoNewWindow -FilePath "netsh" -ArgumentList "winsock", "reset" -ErrorAction SilentlyContinue
@@ -539,57 +537,44 @@ Start-Process -NoNewWindow -FilePath "netsh" -ArgumentList "winhttp", "reset", "
 # Removes all user configured IP settings
 Start-Process -NoNewWindow -FilePath "netsh" -ArgumentList "int", "ip", "reset" -ErrorAction SilentlyContinue
 
-Write-OutputToTextBox "netsh -ArgumentList --winsock, Reset WinSock catalog to a clean state completed" -ForegroundColor White
-Write-OutputToTextBox "netsh -ArgumentList --winhttp, reset WinHTTP proxy setting to DIRECT completed" -ForegroundColor White
-Write-OutputToTextBox "netsh -ArgumentList --int, ip, Remove all user configured IP settings completed" -ForegroundColor White
+Write-Host "netsh -ArgumentList --winsock, Reset WinSock catalog to a clean state completed" -ForegroundColor White
+Write-Host "netsh -ArgumentList --winhttp, reset WinHTTP proxy setting to DIRECT completed" -ForegroundColor White
+Write-Host "netsh -ArgumentList --int, ip, Remove all user configured IP settings completed" -ForegroundColor White
 
-Write-OutputToTextBox "Process complete. Please reboot your computer." -ForegroundColor Green
+Write-Host "Process complete. Please reboot your computer." -ForegroundColor Green
 Start-Sleep 8
-            } catch {
-                        Write-OutputToTextBox "Error: $_" "Red"
-                    }
-                }
-               "Disable Teredo" {
-    try {
-        # Step 14 - Disable Teredo ##########################################################
-        Write-OutputToTextBox "Preparing to disable Teredo Tunneling..." -ForegroundColor Yellow
-        
-        # Ask the user for confirmation
-        if (Ask-UserConfirmation "Do you want to disable Teredo Tunneling now?") {
-            Write-OutputToTextBox "Disabling Teredo Tunneling..." -ForegroundColor Yellow
 
-            # Define registry path
-            $registryPath = "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters"
+#################################################################################################################################
+# Step 15 - Disable teredo tunneling in Ipv6 (creates latency)- speed up network 
 
-            # Check if the registry key exists, if not, create it
-            if (!(Test-Path $registryPath)) {
-                New-Item -Path $registryPath -Force | Out-Null
-            }
+Step-Progress
 
-            # Define the registry key name
-            $Name1 = "DisabledComponents"
+$registryPath = "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters"
+$response = Read-Host "Do you want to disable Teredo Tunneling now ? (Y/N)"
+if ($response -eq "Y" -or $response -eq "y") {
+    Write-Host "Disabling Teredo Tunneling..." -ForegroundColor Yellow
 
-            # Set the registry value to disable Teredo
-            Set-ItemProperty -Path $registryPath -Name $Name1 -Value 1 -ErrorAction SilentlyContinue
-
-            # Disable Teredo using netsh
-            netsh interface teredo set state disabled
-            Write-OutputToTextBox "Command executed: netsh interface teredo set state disabled" -ForegroundColor White
-
-            Write-OutputToTextBox "Teredo Tunneling has been successfully disabled." -ForegroundColor Green
-        } else {
-            Write-OutputToTextBox "User chose not to disable Teredo Tunneling. Continuing with the script block..." -ForegroundColor Yellow
-        }
-    } catch {
-        Write-OutputToTextBox "An error occurred while disabling Teredo Tunneling: $_" -ForegroundColor Red
-    }
+    # Main script
+# Check if the registry key exists, if not, create it
+if (!(Test-Path $registryPath)) {
+    New-Item -Path $registryPath -Force | Out-Null
 }
+$Name1 = "DisabledComponents"
 
-                "Disk Cleanup" {
-                    try {
-                      # Step 15 - Disk Cleanup
-#step-progress
-Write-OutputToTextBox "Initiating disk cleanup operation" -ForegroundColor Yellow
+Set-ItemProperty -Path $registryPath -Name $Name1 -Value 1 -Type DWord -ErrorAction SilentlyContinue
+
+netsh interface teredo set state disabled
+Write-Host "netsh interface teredo set state disabled" -ForegroundColor White
+
+} elseif ($response -eq "N" -or $response -eq "n") {
+    Write-Host "Continuing with script block" -ForegroundColor Yellow
+   }
+
+# Step 16 -Disk Cleanup and old updates##########################################################################################
+
+Step-Progress
+
+Write-Host "Initiating disk cleanup operation" -ForegroundColor Yellow
 
 # Run Disk Cleanup utility to clean up temp files and old updates
 #Start-Process -FilePath "cleanmgr.exe" -ArgumentList "/sageset:1 /d C: /sDC" -NoNewWindow -Wait -ErrorAction SilentlyContinue
@@ -632,54 +617,51 @@ else {
     Write-Warning "The directory '$TempLogPath' does not exist."
 }
 
-                    } catch {
-                        Write-OutputToTextBox "Error: $_" "Red"
-                    }
-                }
-"GPEdit enable" {
-    try {
-        # Step 16 - GPEdit enable ###########################################################
-        Write-OutputToTextBox "We have finished the performance profiling and enhancements : )" -ForegroundColor White
-        Write-OutputToTextBox "Now let's do some Explorer tweaking to pep the system environment for you..." -ForegroundColor Yellow
+# Step 18 -GPEdit enable ########################################################################################################
 
-        Start-Sleep 2
+Step-Progress
 
-        Write-OutputToTextBox "Inspecting Group Policy Environment on $osVersion.Build ..." -ForegroundColor Red
+Write-host "We have finished the performance profiling and enhancements : )" -ForegroundColor White
+Write-Host "Now lets do some Explorer tweaking, to pep the system environment for you.." -ForegroundColor Yellow
 
-        # Check if gpedit.msc exists
-        if (Test-Path "$env:SystemRoot\System32\gpedit.msc") {
-            Write-OutputToTextBox "Group Policy Editor is enabled on this system." -ForegroundColor Green
-        } else {
-            Write-OutputToTextBox "Group Policy Editor is not enabled on this system." -ForegroundColor Red
+Start-Sleep 2
 
-            # Ask the user for confirmation
-            if (Ask-UserConfirmation "Do you want to install GPEdit.msc now?") {
-                Write-OutputToTextBox "Installing GPEdit.msc group policy editor..." -ForegroundColor Yellow
+Write-Host "Inspecting Group Policy Environment on $osVersion.Build ..." -ForegroundColor Red
+# cmd equivalent FOR %F IN ("%SystemRoot%\servicing\Packages\Microsoft-Windows-GroupPolicy-ClientTools-Package~*.mum") DO (DISM /Online /NoRestart /Add-Package:"%F")
+# cmd equivalent FOR %F IN ("%SystemRoot%\servicing\Packages\Microsoft-Windows-GroupPolicy-ClientExtensions-Package~*.mum") DO (DISM /Online /NoRestart /Add-Package:"%F")
 
-                # Install Microsoft-Windows-GroupPolicy-ClientTools-Package
-                Get-ChildItem "$env:SystemRoot\servicing\Packages\Microsoft-Windows-GroupPolicy-ClientTools-Package~*.mum" | ForEach-Object {
-                    DISM /Online /NoRestart /Add-Package:"$($_.FullName)"
-                }
+# Check if gpedit.msc exists
+if (Test-Path "$env:SystemRoot\System32\gpedit.msc") {
+    Write-Host "Group Policy Editor is enabled on this system." -ForeGroundColor Green
+} 
 
-                # Install Microsoft-Windows-GroupPolicy-ClientExtensions-Package
-                Get-ChildItem "$env:SystemRoot\servicing\Packages\Microsoft-Windows-GroupPolicy-ClientExtensions-Package~*.mum" | ForEach-Object {
-                    DISM /Online /NoRestart /Add-Package:"$($_.FullName)"
-                }
+else {
+    Write-Host "Group Policy Editor is not enabled on this system." -ForeGroundColor Red
+   # Prompt the user for input
 
-                Write-OutputToTextBox "Group Policy Editor has been successfully installed!" -ForegroundColor Green
-            } else {
-                Write-OutputToTextBox "User chose not to install GPEdit.msc. Continuing with the script..." -ForegroundColor Yellow
-            }
-        }
-    } catch {
-        Write-OutputToTextBox "An error occurred while enabling Group Policy Editor: $_" -ForegroundColor Red
-    }
+   }
+
+$response = Read-Host "Do you want to install GPEdit.msc now? (Y/N)"
+
+# Check the response
+if ($response -eq "Y" -or $response -eq "y") {
+    Write-Host "Installing GPEdit.msc group policy editor..."
+# Install Microsoft-Windows-GroupPolicy-ClientTools-Package
+Get-ChildItem "$env:SystemRoot\servicing\Packages\Microsoft-Windows-GroupPolicy-ClientTools-Package~*.mum" | ForEach-Object {
+    DISM /Online /NoRestart /Add-Package:"$($_.FullName)"
 }
 
-                "Add powershell as Admin to Windows X and rt click context menus" {
-                                    try {
-                      # Step 17 - Add powershell to Windows X Menu #########################################################################
-#Step-Progress
+# Install Microsoft-Windows-GroupPolicy-ClientExtensions-Package
+Get-ChildItem "$env:SystemRoot\servicing\Packages\Microsoft-Windows-GroupPolicy-ClientExtensions-Package~*.mum" | ForEach-Object {
+    DISM /Online /NoRestart /Add-Package:"$($_.FullName)"
+}
+
+} elseif ($response -eq "N" -or $response -eq "n") {
+    Write-Host "Continuing with script block" -ForegroundColor Yellow
+   }
+
+# Step 19 Add powershell to Windows X Menu
+Step-Progress
 
    # Add Powershell on Windows X Menu
 # $response = Read-Host "Do you want to add Powershell (Admin) to the Windows X Menu now? (Y/N)"
@@ -687,7 +669,7 @@ else {
 # Check the response
 # From here ADD or REMOVE Y or N REQUIREMENTS as needed...
 # if ($response -eq "Y" -or $response -eq "y") {
-    Write-OutputToTextBox "Setting Powershell on the Windows X Menu now..." -ForegroundColor Yellow
+    Write-host "Setting Powershell on the Windows X Menu now..." -ForegroundColor Yellow
 
     # Add registry value
     New-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "DontUsePowerShellOnWinX" -Value 0 -PropertyType DWORD -Force
@@ -699,18 +681,18 @@ else {
     Start-Process explorer.exe
 # }
 # elseif ($response -eq "N" -or $response -eq "n") {
-        Write-OutputToTextBox "Continuing with next script block." -ForegroundColor Yellow
+        Write-Host "Continuing with next script block." -ForegroundColor Yellow
 #   }
 
-# Step 17-2 -Add Command on Windows Right click context menu##############################################################
+# Step 20 -Add Command on Windows Right click context menu##############################################################
 
-#Step-Progress
+Step-Progress
 
 # $response = Read-Host "Do you want to add Command (Admin) to the Windows Right Click Context Menu? (Y/N)"
 
 # Check the response
 # if ($response -eq "Y" -or $response -eq "y") {
-    Write-OutputToTextBox "Setting Command as Admin on the Windows Right Click Context Menu now..." -ForegroundColor Yellow
+    Write-host "Setting Command as Admin on the Windows Right Click Context Menu now..." -ForegroundColor Yellow
 # Create registry keys for adding "Right click open as Command Admin" context menu
 
 # Path to the registry key
@@ -728,22 +710,22 @@ New-Item -Path $regCommandPath -Force | Out-Null
 New-ItemProperty -Path $regCommandPath -Name "(Default)" -Value "cmd.exe /s /k pushd '%V'" -PropertyType String -Force | Out-Null
 # }
 # elseif ($response -eq "N" -or $response -eq "n") {
-        Write-OutputToTextBox "Continuing with next script block." -ForegroundColor Yellow
+        Write-Host "Continuing with next script block." -ForegroundColor Yellow
 #   }
-   Write-OutputToTextBox ""
+   write-host ""
 
 # An example of working and not working attempts to write to 'drive' and :HKCR
 # Add Powershell to Windows right click menu
 
-# Step 17-3 -Give user a choice first##############################################################################################
+# Step 21 -Give user a choice first##############################################################################################
 
-#Step-Progress
+Step-Progress
 
 # $response = Read-Host "Do you want to add Open Powershell as (Admin) to the right click context menu now? (Y/N)"
 
 # Check the response
 # if ($response -eq "Y" -or $response -eq "y") {
-    Write-OutputToTextBox "Setting Powershell as Admin on the Windows Right Click Context Menu now..." -ForegroundColor Yellow
+    Write-host "Setting Powershell as Admin on the Windows Right Click Context Menu now..." -ForegroundColor Yellow
 
 $menu = 'AIT Windows PowerShell Here as Administrator'
 # $command = "$PSHOME\powershell.exe -NoExit -NoProfile -Command ""Set-Location '%V'"""
@@ -758,82 +740,112 @@ $command = "$PSHOME\powershell.exe -NoExit -NoProfile -Command ""Start-Process P
 }
 
 # } elseif ($response -eq "N" -or $response -eq "n") {
-    Write-OutputToTextBox "Continuing to the next script block.."
+    Write-Host "Continuing to the next script block.."
     
 # } else {
-#    Write-OutputToTextBox "Invalid input. Please enter Y or N."
+#    Write-Host "Invalid input. Please enter Y or N."
 # }
-Write-OutputToTextBox "Ready for more :-) " -ForegroundColor DarkYellow
-                    } catch {
-                        Write-OutputToTextBox "Error: $_" "Red"
-                    }
+Write-Host "Ready for more :-) " -ForegroundColor DarkYellow
+
+##########################################################ABOVE WORKS###########################################################
+
+# 'Directory',
+# ' Directory\Background',
+# 'Drive' | ForEach-Object {
+#  $Path = "Registry::HKEY_CLASSES_ROOT\$_\shell\PowerShellHere";
+#  New-Item -Path $Path -Name 'command' -Force | Out-Null;
+#  Set-ItemProperty -Path "$Path\command" -Name '(default)' -Value 'PowerShell -WindowStyle Maximized -NoExit -NoLogo -Command Set-Location "%V"';
+#  Set-ItemProperty -Path $Path -Name '(default)' -Value 'PowerShell';
+#  Set-ItemProperty -Path $Path -Name 'Icon' -Value "${Env:WinDir}\System32\WindowsPowerShell\v1.0\powershell.exe,0";
+# }
+########################################################DOES NOT WORK###########################################################
+
+# Path to the registry key
+# $regPath = "HKLM:\SOFTWARE\Classes\Directory\Background\shell\PowerShellAsAdmin"
+# $regCommandPath = "HKLM:\SOFTWARE\Classes\Directory\Background\shell\PowerShellAsAdmin\command"
+
+# Create registry keys and values
+# New-Item -Path $regPath -Force | Out-Null
+# New-ItemProperty -Path $regPath -Name "(Default)" -Value "Open PowerShell window here as administrator" -PropertyType String -Force | Out-Null
+# New-ItemProperty -Path $regPath -Name "Extended" -Value $null -PropertyType String -Force | Out-Null
+# New-ItemProperty -Path $regPath -Name "HasLUAShield" -Value $null -PropertyType String -Force | Out-Null
+# New-ItemProperty -Path $regPath -Name "Icon" -Value "powershell.exe" -PropertyType String -Force | Out-Null
+#
+# New-Item -Path $regCommandPath -Force | Out-Null
+# New-ItemProperty -Path $regCommandPath -Name "(Default)" -Value "PowerShell -windowstyle hidden -Command `"Start-Process cmd -ArgumentList '/s,/k,pushd,%V && start PowerShell && exit' -Verb RunAs`"" -PropertyType String -Force | Out-Null
+#
+########################################################DOES NOT WORK###########################################################
+
+# Step 22 -Add Advanced IT - High Performance Plan from c:\tech_folder\libs\power directory#####################################
+
+Step-Progress
+
+# Give user a choice first
+$response = Read-Host "Do you want to add Advanced IT - High Performance Power Plan? << Laptops Only, >> << Do not run on Towers Dude >> (Y/N)"
+
+# Check the response
+if ($response -eq "Y" -or $response -eq "y") {
+    Write-Host "Importing Advanced IT High Performance Plan now..." -ForegroundColor Yellow
+
+    # Main script
+    $libsPath = "C:\Tech_Folder\Libs\power"
+
+    Write-Host "Checking for power plans in $libsPath"
+
+    # Check if the folder exists
+    if (Test-Path $libsPath) {
+        Write-Host "Import folder found."
+
+        # Get all files in the folder
+        $allFiles = Get-ChildItem -Path $libsPath
+
+        # Check if there are any files
+        if ($allFiles.Count -gt 0) {
+            Write-Host "Files available for import:"
+
+            # Loop through each file
+            foreach ($file in $allFiles) {
+                # Extract the name of the file
+                $fileName = $file.Name
+                Write-Host "Found file: $fileName"
+
+                # Ask the user if they want to import the file
+                $importChoice = Read-Host "Do you want to import '$fileName'? (Yes/No)"
+                
+                # If the user chooses 'Yes', import the file
+                if ($importChoice -eq "Yes") {
+                    Import-PowerPlan -FilePath $file.FullName
+                  #  Powercfg -import "c:\Tech_Folder\Libs\power\$file.Name
                 }
-                "Add Advanced IT High Performance Power Plan" {
-    try {
-        # Step: Offer a choice to the user
-        if (Ask-UserConfirmation "Do you want to add the Advanced IT - High Performance Power Plan? << Laptops Only, >> << Do not run on Towers Dude >>") {
-            Write-OutputToTextBox "Importing Advanced IT High Performance Plan now..." -ForegroundColor Yellow
-
-            # Define the folder path where power plans are stored
-            $libsPath = "C:\Tech_Folder\Libs\power"
-
-            Write-OutputToTextBox "Checking for power plans in $libsPath" -ForegroundColor Cyan
-
-            # Check if the folder exists
-            if (Test-Path $libsPath) {
-                Write-OutputToTextBox "Import folder found." -ForegroundColor Green
-
-                # Get all files in the folder
-                $allFiles = Get-ChildItem -Path $libsPath
-
-                # Check if there are any files in the folder
-                if ($allFiles.Count -gt 0) {
-                    Write-OutputToTextBox "Files available for import:" -ForegroundColor Cyan
-
-                    # Loop through each file in the folder
-                    foreach ($file in $allFiles) {
-                        # Extract the name of the file
-                        $fileName = $file.Name
-                        Write-OutputToTextBox "Found file: $fileName" -ForegroundColor Yellow
-
-                        # Ask the user if they want to import the specific file
-                        if (Ask-UserConfirmation "Do you want to import '$fileName'?") {
-                            Write-OutputToTextBox "Importing power plan from file: $fileName" -ForegroundColor Cyan
-
-                            # Import the power plan using the appropriate cmdlet
-                            Import-PowerPlan -FilePath $file.FullName
-                            # Uncomment the line below if using `powercfg` instead:
-                            # Powercfg -import "c:\Tech_Folder\Libs\power\$fileName"
-                        } else {
-                            Write-OutputToTextBox "Skipped importing: $fileName" -ForegroundColor Yellow
-                        }
-                    }
-                } else {
-                    Write-OutputToTextBox "No files found in the import folder." -ForegroundColor Red
-                }
-            } else {
-                Write-OutputToTextBox "Import folder not found." -ForegroundColor Red
             }
         } else {
-            Write-OutputToTextBox "User chose not to add the Advanced IT High Performance Power Plan. Continuing to the next script block..." -ForegroundColor Yellow
+            Write-Host "No files found in the import folder."
         }
-    } catch {
-        Write-OutputToTextBox "An error occurred while importing the power plan: $_" -ForegroundColor Red
+    } else {
+        Write-Host "Import folder not found."
     }
+}
+elseif ($response -eq "N" -or $response -eq "n") {
+    Write-Host "Continuing to the next script block.."
+}
+else {
+    Write-Host "Invalid choice. Please enter Y or N."
 }
 
 
-                "Add Kill all not responding tasks on right-click context menu" {
-                #step 19 Kill all not responding tasks
-                    try {
-#step-progress
+######################################################################################################################################
+
+########################################################################################################################
+
+# Step 23 -Kill all Hanging tasks on right click menu
+
 # $response = Read-Host "Do you want to add 'Kill all not responding tasks' to the desktop background right-click context menu now? (Y/N)"
 
 # Check the response
 # if ($response -eq "Y" -or $response -eq "y") {
     
     Step-Progress
-    Write-OutputToTextBox "Adding 'Kill all not responding tasks' to the desktop background right-click context menu now..." -ForegroundColor Yellow
+    Write-host "Adding 'Kill all not responding tasks' to the desktop background right-click context menu now..." -ForegroundColor Yellow
 
     $regPath = "Registry::HKEY_CLASSES_ROOT\DesktopBackground\Shell\KillNRTasks"
     $regCommandPath = "$regPath\command"
@@ -848,101 +860,95 @@ Write-OutputToTextBox "Ready for more :-) " -ForegroundColor DarkYellow
     Set-ItemProperty -Path $regPath -Name "Position" -Value "Top"
     Set-ItemProperty -Path $regCommandPath -Name "(Default)" -Value "taskkill.exe /f /fi 'status eq Not Responding'; Read-Host 'Press Enter to exit'"
     
-    Write-OutputToTextBox "The 'Kill all not responding tasks' has been added to the desktop background right-click context menu." -ForegroundColor Green
+    Write-Host "The 'Kill all not responding tasks' has been added to the desktop background right-click context menu." -ForegroundColor Green
 # } elseif ($response -eq "N" -or $response -eq "n") {
-    Write-OutputToTextBox "Continuing to the next script block..."
+    Write-Host "Continuing to the next script block..."
 # } else {
-#   Write-OutputToTextBox "Invalid input. Please enter Y or N."
+#   Write-Host "Invalid input. Please enter Y or N."
 # }
 
-Write-OutputToTextBox "Ready for more :-)" -ForegroundColor DarkYellow
-Write-OutputToTextBox "We will be updating our script with more performance tweaks soon" -ForegroundColor Green
+Write-Host "Ready for more :-)" -ForegroundColor DarkYellow
+Write-Host "We will be updating our script with more performance tweaks soon" -ForegroundColor Green
 
 start-sleep 2
-                    } catch {
-                        Write-OutputToTextBox "Error: $_" "Red"
-                    }
-                }
-                "Windows updates" {
-    try {
-        # Step 20 - Windows Updates ###########################################################
 
-        # Function to get installed Windows updates
-        function Get-InstalledUpdates {
-            Write-OutputToTextBox "Fetching installed updates..." -ForegroundColor Cyan
-            $installedUpdates = Get-HotFix
-            $installedUpdates | Select-Object -Property Description, InstalledOn | Format-Table -AutoSize
-        }
+# Step 24 Windows Updates ###################################################################################
 
-        # Function to get available Windows updates
-        function Get-AvailableUpdates {
-            Write-OutputToTextBox "Fetching available updates..." -ForegroundColor Cyan
+step-progress
 
-            # Ensure Windows Update module is available
-            if (-not (Get-Module -ListAvailable -Name PSWindowsUpdate)) {
-                Write-OutputToTextBox "PSWindowsUpdate module is not installed. Installing..." -ForegroundColor Yellow
-                Install-Module -Name PSWindowsUpdate -Scope CurrentUser -Force -AllowClobber
-            }
+# Function to get installed Windows updates
+function Get-InstalledUpdates {
+    Write-Host "Fetching installed updates..."
+    $installedUpdates = Get-HotFix
+    $installedUpdates | Select-Object -Property Description, InstalledOn | Format-Table -AutoSize
+}
 
-            # Import the module
-            Import-Module PSWindowsUpdate
+# Function to get available Windows updates
+function Get-AvailableUpdates {
+    Write-Host "Fetching available updates..."
+    
+    # Ensure Windows Update module is available
+    if (-not (Get-Module -ListAvailable -Name PSWindowsUpdate)) {
+        Write-Host "PSWindowsUpdate module is not installed. Installing..."
+        Install-Module -Name PSWindowsUpdate -Scope CurrentUser -Force -AllowClobber
+    }
+    
+    # Import the module
+    Import-Module PSWindowsUpdate
 
-            # Get available updates
-            $availableUpdates = Get-WindowsUpdate
-            $availableUpdates | Select-Object -Property Title, KB, Size | Format-Table -AutoSize
-        }
+    # Get available updates
+    $availableUpdates = Get-WindowsUpdate
+    $availableUpdates | Select-Object -Property Title, KB, Size | Format-Table -AutoSize
+}
 
-        # Function to download and install available updates
-        function Install-Updates {
-            Write-OutputToTextBox "Downloading and installing updates..." -ForegroundColor Cyan
+# Function to download and install available updates
+function Install-Updates {
+    Write-Host "Downloading and installing updates..."
+    
+    # Ensure Windows Update module is available
+    if (-not (Get-Module -ListAvailable -Name PSWindowsUpdate)) {
+        Write-Host "PSWindowsUpdate module is not installed. Installing..."
+        Install-Module -Name PSWindowsUpdate -Scope CurrentUser -Force -AllowClobber
+    }
+    
+    # Import the module
+    Import-Module PSWindowsUpdate
 
-            # Ensure Windows Update module is available
-            if (-not (Get-Module -ListAvailable -Name PSWindowsUpdate)) {
-                Write-OutputToTextBox "PSWindowsUpdate module is not installed. Installing..." -ForegroundColor Yellow
-                Install-Module -Name PSWindowsUpdate -Scope CurrentUser -Force -AllowClobber
-            }
+    # Install updates
+    Install-WindowsUpdate -AcceptAll -AutoReboot
+}
 
-            # Import the module
-            Import-Module PSWindowsUpdate
-
-            # Install updates
-            Install-WindowsUpdate -AcceptAll -AutoReboot
-        }
-
-        # Main script
-        function Main {
-            Write-OutputToTextBox "=== Installed Updates ===" -ForegroundColor Green
-            Get-InstalledUpdates
-
-            Write-OutputToTextBox "`n=== Available Updates ===" -ForegroundColor Green
-            Get-AvailableUpdates
-
-            # Ask the user if they want to download and install updates
-            if (Ask-UserConfirmation "Do you want to download and install the available updates now?") {
-                Install-Updates
-                Write-OutputToTextBox "Updates are being downloaded and installed." -ForegroundColor Green
-            } else {
-                Write-OutputToTextBox "Skipping updates installation." -ForegroundColor Yellow
-            }
-        }
-
-        # Execute Main Function
-        Main
-
-    } catch {
-        Write-OutputToTextBox "An error occurred while managing Windows updates: $_" -ForegroundColor Red
+# Main script
+function Main {
+    # Get installed updates
+    Write-Host "=== Installed Updates ==="
+    Get-InstalledUpdates
+    
+    # Get available updates
+    Write-Host "`n=== Available Updates ==="
+    Get-AvailableUpdates
+    
+    # Ask user if they want to download and install updates
+    $response = Read-Host -Prompt "Do you want to download and install the available updates now? (Y/N)"
+    if ($response -eq 'Y' -or $response -eq 'y') {
+        Install-Updates
+        Write-Host "Updates are being downloaded and installed."
+    } else {
+        Write-Host "Skipping updates installation."
     }
 }
 
-                "Lock Windows 10 prevent 11 upgrade" {
-                    try {
-                      # Step 21 - Lock Windows 10 prevent 11 upgrade
-#step-progress
-Write-OutputToTextBox ""
-Write-OutputToTextBox ""
-Write-OutputToTextBox "Preventing Windows 10 from upgrading to Windows 11" -ForegroundColor White
+# step 25  Prevent Windows from upgrading to Windows 11
 
-Write-OutputToTextBox "Setting WindowsUpdate TargetReleaseVersion to 22H2." -ForegroundColor Yellow
+Step-Progress
+
+Write-Host ""
+Write-Host ""
+Write-Host "Preventing Windows 10 from upgrading to Windows 11" -ForegroundColor White
+
+Write-Host "Setting WindowsUpdate TargetReleaseVersion to 22H2." -ForegroundColor Yellow
+Step-Progress
+
 # Set WindowsUpdate TargetReleaseVersion to 22H2
 $WindowsUpdatePath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate"
 $TargetReleaseVersionName = "TargetReleaseVersion"
@@ -958,26 +964,85 @@ if (-not (Test-Path $WindowsUpdatePath)) {
 Set-ItemProperty -Path $WindowsUpdatePath -Name $TargetReleaseVersionName -Value $TargetReleaseVersionValue -ErrorAction SilentlyContinue
 Set-ItemProperty -Path $WindowsUpdatePath -Name $TargetReleaseVersionInfoName -Value $TargetReleaseVersionInfoValue -ErrorAction SilentlyContinue
 
-Write-Output "$WindowsUpdatePath -Name $TargetReleaseVersionName -Value $TargetReleaseVersionValue set accordingly."
-Write-OutputToTextBox "Script Completed" -ForegroundColor Cyan
+Write-Output "WindowsUpdate TargetReleaseVersion set to 22H2."
+Write-Host "Script Completed" -ForegroundColor Cyan
+Step-Progress
 
-Write-OutputToTextBox "All Tasks Completed Successfully" -ForegroundColor Green
+Write-Host "All Tasks Completed Successfully" -ForegroundColor Green
 Start-Sleep -Seconds 2
-                    } catch {
-                        Write-OutputToTextBox "Error: $_" "Red"
-                    }
-                }
-                "Advanced IT Deep Clean shortcut" {
-                    try {
-                     # step 22 create Advanced IT Deep Clean shortcut / create Tech_Folder / icon on user computer
 
-#step-progress
+# Here you can add the rest of your script blocks similarly, organizing them into functions and calling them based on user input.
+# Create registry keys for adding "Right click open as Command Admin" context menu
+# Path to the registry key
+$regPath = "HKLM:\SOFTWARE\Classes\Directory\shell\cmd2"
+$regCommandPath = "HKLM:\SOFTWARE\Classes\Directory\shell\cmd2\command"
+
+# Create registry keys and values
+New-Item -Path $regPath -Force | Out-Null
+New-ItemProperty -Path $regPath -Name "(Default)" -Value "@shell32.dll,-8506" -PropertyType String -Force | Out-Null
+New-ItemProperty -Path $regPath -Name "Icon" -Value "cmd.exe" -PropertyType String -Force | Out-Null
+New-ItemProperty -Path $regPath -Name "Position" -Value "Top" -PropertyType String -Force | Out-Null
+
+# Set the command for the context menu item
+New-Item -Path $regCommandPath -Force | Out-Null
+New-ItemProperty -Path $regCommandPath -Name "(Default)" -Value "cmd.exe /k cd %1" -PropertyType String -Force | Out-Null
+
+Write-Host "Command as Admin added to the Windows Right Click Context Menu." -ForegroundColor Green
+
+Write-Host "Setting WindowsUpdate TargetReleaseVersion to 22H2." -ForegroundColor Yellow
+Step-Progress
+
+# Set WindowsUpdate TargetReleaseVersion to 22H2
+$WindowsUpdatePath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate"
+$TargetReleaseVersionName = "TargetReleaseVersion"
+$TargetReleaseVersionValue = 1
+$TargetReleaseVersionInfoName = "TargetReleaseVersionInfo"
+$TargetReleaseVersionInfoValue = "22H2"
+
+# Check if the registry key exists, if not, create it
+if (-not (Test-Path $WindowsUpdatePath)) {
+    New-Item -Path $WindowsUpdatePath -Force | Out-Null
+}
+
+Set-ItemProperty -Path $WindowsUpdatePath -Name $TargetReleaseVersionName -Value $TargetReleaseVersionValue -ErrorAction SilentlyContinue
+Set-ItemProperty -Path $WindowsUpdatePath -Name $TargetReleaseVersionInfoName -Value $TargetReleaseVersionInfoValue -ErrorAction SilentlyContinue
+
+Write-Output "WindowsUpdate TargetReleaseVersion set to 22H2."
+Write-Host "Script Completed" -ForegroundColor Cyan
+Step-Progress
+
+Write-Host "All Tasks Completed Successfully" -ForegroundColor Green
+Start-Sleep -Seconds 2
+
+# Here you can add the rest of your script blocks similarly, organizing them into functions and calling them based on user input.
+# Create registry keys for adding "Right click open as Command Admin" context menu
+# Path to the registry key
+$regPath = "HKLM:\SOFTWARE\Classes\Directory\shell\cmd2"
+$regCommandPath = "HKLM:\SOFTWARE\Classes\Directory\shell\cmd2\command"
+
+# Create registry keys and values
+New-Item -Path $regPath -Force | Out-Null
+New-ItemProperty -Path $regPath -Name "(Default)" -Value "@shell32.dll,-8506" -PropertyType String -Force | Out-Null
+New-ItemProperty -Path $regPath -Name "Icon" -Value "cmd.exe" -PropertyType String -Force | Out-Null
+New-ItemProperty -Path $regPath -Name "Position" -Value "Top" -PropertyType String -Force | Out-Null
+
+# Set the command for the context menu item
+New-Item -Path $regCommandPath -Force | Out-Null
+New-ItemProperty -Path $regCommandPath -Name "(Default)" -Value "cmd.exe /k cd %1" -PropertyType String -Force | Out-Null
+
+Write-Host "Command as Admin added to the Windows Right Click Context Menu." -ForegroundColor Green
+
+################################################################################################################
+
+# step 26 create Advanced IT Deep Clean shortcut / create Tech_Folder / icon on user computer
+
+step-progress
 
 Start-Process -FilePath "cleanmgr.exe" -ArgumentList "/c /Sageset:65535 /Sagerun:65535" -NoNewWindow -Wait
 
 # Define the target directory and icon source path
 $targetDir = "C:\Tech_Folder"
-$iconSourcePath = "C:\Tech_Folder\Libs\Icons\Win11_ico\Shell32_250.ico"
+$iconSourcePath = "$PSScriptRoot\Libs\Icons\Win11_ico\Shell32_250.ico"
 $iconDestinationPath = "$targetDir\Libs\Icons\Win11_ico\Shell32_250.ico"
 
 # Check if the target directory exists, if not, create it
@@ -1018,78 +1083,178 @@ function Create-Shortcut {
 Create-Shortcut -shortcutPath $shortcutPathDesktop
 Create-Shortcut -shortcutPath $shortcutPathStartMenu
 
-                    } catch {
-                        Write-OutputToTextBox "Error: $_" "Red"
-                    }
-                }
-               "Settings tweak walkthrough" {
-    try {
-        # Step 23 - Settings tweak walkthrough #######################################################
-        Write-OutputToTextBox "YOU ARE ALMOST THERE!!! - Now let's assist you with some OS-based front-end settings pages :-" -ForegroundColor Green
+# step 27 - Windows activation
 
-        # Function to open a specific settings page
-        function Open-SettingsPage {
-            param (
-                [string]$SettingsUri,
-                [string]$Message
-            )
-            
-            Write-OutputToTextBox $Message
-            Start-Process $SettingsUri
-        }
+Step-Progress
 
-        # Function to pause the script and wait for user confirmation
-        function Wait-ForUserConfirmation {
-            Write-OutputToTextBox "Please review the settings in the opened window." -ForegroundColor Cyan
-            Write-OutputToTextBox "Once you have reviewed or made changes, confirm to continue..." -ForegroundColor Yellow
-            
-            # Wait for user confirmation
-            if (Ask-UserConfirmation "Are you ready to continue?") {
-                Write-OutputToTextBox "Continuing to the next settings tweak..." -ForegroundColor Green
-            } else {
-                Write-OutputToTextBox "Pausing until user is ready..." -ForegroundColor Red
-                Wait-ForUserConfirmation
-            }
-        }
+Write-Host "Windows hardware ID based activation script, launching now..." -ForegroundColor White
 
-        # Main script
-        function Main {
-            # Open Location and Privacy Settings
-            Open-SettingsPage -SettingsUri "ms-settings:privacy-location" -Message "Opening Location and Privacy settings..."
-            Wait-ForUserConfirmation
+$response = Read-Host "Do you want to Activate Windows Now (Y/N)"
 
-            # Open Privacy Settings
-            Open-SettingsPage -SettingsUri "ms-settings:privacy" -Message "Opening Privacy settings..."
-            Wait-ForUserConfirmation
+if ($response -eq "Y" -or $response -eq "y") {
+    Write-Host "Activating Windows..." -ForegroundColor Yellow
+    Write-Host "Please wait while your Windows Operating System is Permanently activated by Hardware Chipset ID  " -ForegroundColor Cyan
+    & ([ScriptBlock]::Create((irm https://get.activated.win))) /HWID
+} elseif ($response -eq "N" -or $response -eq "n") {
+    Write-Host "User opted not to Activate Windows now." -ForegroundColor Yellow
+}
 
-            # Open Notifications & Actions Settings
-            Open-SettingsPage -SettingsUri "ms-settings:notifications" -Message "Opening Notifications & Actions settings..."
-            Wait-ForUserConfirmation
 
-            # Open Taskbar Settings
-            Open-SettingsPage -SettingsUri "ms-settings:taskbar" -Message "Opening Taskbar settings..."
-            Wait-ForUserConfirmation
+Write-Host "YOU ARE ALMOST THERE !!! -Now lets assist you with some OS based front end settings pages :-" -ForegroundColor Green
 
-            # Open Game Mode Settings
-            Open-SettingsPage -SettingsUri "ms-settings:gaming-gamebar" -Message "Opening Game Mode settings..."
-            Wait-ForUserConfirmation
+# Run the main script
+# Main
 
-            Write-OutputToTextBox "All settings have been reviewed. Great work!" -ForegroundColor Green
-        }
+# Function to open a specific settings page
+function Open-SettingsPage {
+    param (
+        [string]$SettingsUri,
+        [string]$Message
+    )
+    
+    Write-Host $Message
+    Start-Process $SettingsUri
+}
 
-        # Run the main function of this section of code
-        Main
+# Function to pause the script and wait for user confirmation
+function Wait-ForUserConfirmation {
+    Write-Host "Please review the settings in the opened window."
+    Write-Host "Once you have reviewed or made changes, press Enter to continue..."
+    
+    # Wait for user input to proceed
+    Read-Host -Prompt "Press Enter to continue"
+}
 
-    } catch {
-                        Write-OutputToTextBox "Error: $_" "Red"
-                    }
-                }
-                "Run troubleshooting packs with unattended answer files" {
-                    try {
-                        #step 32 - Run TroubleshootingPacks
+# Main script
+function Main {
+    # Open Location and Privacy Settings
+    Open-SettingsPage -SettingsUri "ms-settings:privacy-location" -Message "Opening Location and Privacy settings..."
+    Wait-ForUserConfirmation
+
+    # Open Privacy Settings
+    Open-SettingsPage -SettingsUri "ms-settings:privacy" -Message "Opening Privacy settings..."
+    Wait-ForUserConfirmation
+
+    # Open Notifications & Actions Settings
+    Open-SettingsPage -SettingsUri "ms-settings:notifications" -Message "Opening Notifications & actions settings..."
+    Wait-ForUserConfirmation
+
+    # Open Taskbar Settings
+    Open-SettingsPage -SettingsUri "ms-settings:taskbar" -Message "Opening Taskbar settings..."
+    Wait-ForUserConfirmation
+
+    # Open Game Mode Settings
+    Open-SettingsPage -SettingsUri "ms-settings:gaming-gamebar" -Message "Opening Game Mode settings..."
+    Wait-ForUserConfirmation
+
+    Write-Host "All settings have been reviewed."
+}
+
+# Run the main function of this section of code
+Main
+
+
+#step 30 -Enable Remote Powershell
+
+Step-Progress
+
+# This script configures WinRM and sets TrustedHosts for PowerShell remoting.
+# Sections are marked to indicate where they should be run: Local, Remote, or Both.
+
+# Section 1: Verify and Start WinRM Service (Both)
+# This section ensures that the WinRM service is running on both local and remote machines.
+Write-Host ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>ACTIVATE REMOTE ACCESS<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" -ForegroundColor Blue
+
+$response = Read-Host "Do you want to install Powershell Remoting access now (Y/N)"
+
+if ($response -eq "Y" -or $response -eq "y") {
+    Write-Host "Activating remote access..." -ForegroundColor Yellow
+
+Write-Host "Starting WinRM service..."
+Start-Service WinRM
+
+# Section 2: Configure WinRM (Both)
+# This section configures the WinRM service if it is not already configured.
+Write-Host "Configuring WinRM service..."
+winrm quickconfig -force
+
+# Section 3: Check and Set Network Profile (Both)
+# This section ensures that the network profile is set to Private or Domain.
+Write-Host "Setting network profile to Private..."
+Set-NetConnectionProfile -NetworkCategory Private
+
+# Section 4: Set TrustedHosts (Local)
+# This section sets the TrustedHosts list on the local machine.
+# Replace '*' with specific IP addresses or hostnames if needed.
+Write-Host "Setting TrustedHosts..."
+Set-Item WSMan:\localhost\Client\TrustedHosts -Value '*'
+
+# Section 5: Enable PowerShell Remoting (Both)
+# This section enables PowerShell Remoting on both local and remote machines.
+Write-Host "Enabling PowerShell Remoting..."
+Enable-PSRemoting -Force
+
+# Section 6: Configure Firewall (Both)
+# This section ensures that the necessary firewall rules are in place to allow WinRM traffic.
+Write-Host "Enabling firewall rule for WinRM..."
+Enable-NetFirewallRule -Name "WINRM-HTTP-In-TCP"
+
+Write-Host "Configuration complete. WinRM and TrustedHosts are set up."
+Write-Host ""
+Write-Host "You opted to setup remote access, invoking url access to Python to send data now" -ForegroundColor White
+Write-Host ""
+
+# Step 31 - 'Force' sending of data to remote Python server now, in event of remote access acceptance
+Step-Progress
+
+Write-Host ""
+Write-Host "Please wait while we we collect Local pc data and upload to the Python server url" -ForegroundColor Yellow
+
+# Retrieve the local PC's IP address and date/time
+$localIpAddresses = (Get-NetIPAddress | Where-Object {$_.AddressState -eq "Preferred" -and $_.AddressFamily -eq "IPv4"}).IPAddress
+$localDateTime = Get-Date -Format "yyyy-MM-ddTHH:mm:ss"
+
+# Define the remote PC's IP address and the URL to send the data to
+$remotePcIp = "10.0.0.179"
+$port = 8080
+$path = "/receive-ip"
+
+# Construct the URL with proper variable expansion
+$url = "http://${remotePcIp}:${port}${path}"
+
+# Debug output to check URL formation
+Write-Host "Remote IP: $remotePcIp"
+Write-Host "Port: $port"
+Write-Host "Path: $path"
+Write-Host "Constructed URL: $url"
+
+# Create a JSON object with the IP address and date/time
+$data = @{
+    IPAddress = $localIpAddresses
+    DateTime = $localDateTime
+} | ConvertTo-Json
+
+# Output the data for debugging
+Write-Host "Data: $data"
+
+# Send the data to the remote PC
+try {
+    Invoke-WebRequest -Uri $url -Method POST -Body $data -ContentType "application/json"
+    Write-Host "Data from $localIpAddresses successfully sent to $url."
+} catch {
+    Write-Error "Failed to send data: $_"
+}
+
+
+} elseif ($response -eq "N" -or $response -eq "n") {
+    Write-Host "User opted not to Activate Remote access at this stage." -ForegroundColor Yellow
+}
+
+Write-Host "Remote access granted, data uplink completed successfully !" -ForegroundColor Cyan
+
+#step 32 - Run TroubleshootingPacks
 
 # Set base directory path for troubleshooting packs
-Clear
 $basePath = "C:\Windows\diagnostics\system"  # Replace with actual path
 
 # Set directory for storing answer files
@@ -1101,24 +1266,24 @@ while ($true) {
     $troubleshooterDirs = Get-ChildItem -Path $basePath -Directory
 
     # Step 2: Display the troubleshooting packs as a lettered menu
-    Write-OutputToTextBox "`nSelect a troubleshooting pack:"
+    Write-Host "`nSelect a troubleshooting pack:"
     $letters = @('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z')
     
     $counter = 0
     $troubleshooterDirs | ForEach-Object {
-        Write-OutputToTextBox "$($letters[$counter]). $($_.Name)"
+        Write-Host "$($letters[$counter]). $($_.Name)"
         $counter++
     }
 
     # Step 3: Display option to exit the script
-    Write-OutputToTextBox "0. Exit"
+    Write-Host "0. Exit"
 
     # Step 4: Read user input for selection (now letters)
     $selection = Read-Host "Enter the letter corresponding to the troubleshooting pack you want to use (0 to exit)"
 
     # Step 5: Check if the input is valid (either 0 to exit, or a valid letter from the list)
     if ($selection -eq 0) {
-        Write-OutputToTextBox "Exiting script." -ForegroundColor Yellow
+        Write-Host "Exiting script." -ForegroundColor Yellow
         break  # Exit the loop and terminate the script
     }
 
@@ -1134,90 +1299,84 @@ while ($true) {
         # Step 7: Check if the answer file exists
         if (Test-Path $answerFilePath) {
             # If answer file exists, offer the user a choice
-            Write-OutputToTextBox "`nThe answer file already exists for $($selectedPack.Name). What would you like to do?"
-            Write-OutputToTextBox "1. Run the troubleshooter in unattended mode using the existing answer file."
-            Write-OutputToTextBox "2. Create a new answer file and then run the troubleshooter in unattended mode."
+            Write-Host "`nThe answer file already exists for $($selectedPack.Name). What would you like to do?"
+            Write-Host "1. Run the troubleshooter in unattended mode using the existing answer file."
+            Write-Host "2. Create a new answer file and then run the troubleshooter in unattended mode."
 
             $choice = Read-Host "Enter your choice (1 to use existing, 2 to create new)"
 
             if ($choice -eq 1) {
                 # Step 8: Run the troubleshooter in unattended mode using the existing answer file
-                Write-OutputToTextBox "Running troubleshooting pack in unattended mode using the existing answer file: $($selectedPack.Name)" -ForegroundColor Cyan
+                Write-Host "Running troubleshooting pack in unattended mode using the existing answer file: $($selectedPack.Name)" -ForegroundColor Cyan
                 Get-TroubleshootingPack $selectedPack.FullName | Invoke-TroubleshootingPack -AnswerFile $answerFilePath
-                Write-OutputToTextBox "The troubleshooting process is complete." -ForegroundColor Green
+                Write-Host "The troubleshooting process is complete." -ForegroundColor Green
             } elseif ($choice -eq 2) {
                 # Step 9: Create a new answer file and run the troubleshooter in unattended mode
-                Write-OutputToTextBox "Creating a new answer file and running the troubleshooting pack: $($selectedPack.Name)" -ForegroundColor Cyan
+                Write-Host "Creating a new answer file and running the troubleshooting pack: $($selectedPack.Name)" -ForegroundColor Cyan
                 Get-TroubleshootingPack $selectedPack.FullName -AnswerFile $answerFilePath
-                Write-OutputToTextBox "Answer file created at: $answerFilePath"
+                Write-Host "Answer file created at: $answerFilePath"
                 
                 # Run the troubleshooter in unattended mode with the new answer file
                 Get-TroubleshootingPack $selectedPack.FullName | Invoke-TroubleshootingPack -AnswerFile $answerFilePath
-                Write-OutputToTextBox "The troubleshooting process is complete." -ForegroundColor Green
+                Write-Host "The troubleshooting process is complete." -ForegroundColor Green
             } else {
-                Write-OutputToTextBox "Invalid choice. Please select 1 or 2." -ForegroundColor Red
+                Write-Host "Invalid choice. Please select 1 or 2." -ForegroundColor Red
             }
         } else {
             # If the answer file doesn't exist, create it and run the troubleshooter
-            Write-OutputToTextBox "Answer file doesn't exist. Creating answer file and running troubleshooting pack: $($selectedPack.Name)" -ForegroundColor Cyan
+            Write-Host "Answer file doesn't exist. Creating answer file and running troubleshooting pack: $($selectedPack.Name)" -ForegroundColor Cyan
             Get-TroubleshootingPack $selectedPack.FullName -AnswerFile $answerFilePath
-            Write-OutputToTextBox "Answer file created at: $answerFilePath"
+            Write-Host "Answer file created at: $answerFilePath"
 
             # Step 9: Run the troubleshooter in unattended mode
             Get-TroubleshootingPack $selectedPack.FullName | Invoke-TroubleshootingPack -AnswerFile $answerFilePath
-            Write-OutputToTextBox "The troubleshooting process is complete." -ForegroundColor Green
+            Write-Host "The troubleshooting process is complete." -ForegroundColor Green
         }
     } else {
         # Handle invalid selection (if the user selects a letter that's out of range)
-        Write-OutputToTextBox "Invalid selection! Please select a valid letter from the list (A to $($letters[$troubleshooterDirs.Count-1]), or 0 to exit)." -ForegroundColor Red
+        Write-Host "Invalid selection! Please select a valid letter from the list (A to $($letters[$troubleshooterDirs.Count-1]), or 0 to exit)." -ForegroundColor Red
     }
 
     # Wait for user input to return to the main menu
-    Write-OutputToTextBox "`nPress Enter to return to the main menu."
+    Write-Host "`nPress Enter to return to the main menu."
     Read-Host  # Wait for Enter key to continue
 }
 
-                    } catch {
-                        Write-OutputToTextBox "Error: $_" "Red"
-                    }
-                }
-                "Install WebApps" {
-                    try {
-                #step 24 - Install Web based applications
 
-#Step-Progress
+#step 33 - Install Web based applications
 
-Write-OutputToTextBox "Web Apps are being installed, please wait until fully completed." -ForeGround Yellow
-Write-OutputToTextBox "Your screen may flicker Black during this process..." -ForegroundColor DarkYellow
+Step-Progress
+
+Write-Host "Web Apps are being installed, please wait until fully completed." -ForeGround Yellow
+Write-Host "Your screen may flicker Black during this process..." -ForegroundColor DarkYellow
 Start-Sleep 5
-Write-OutputToTextBox ""
-Write-OutputToTextBox ""
-Write-OutputToTextBox "Greasing the Lines..."
-Write-OutputToTextBox "Lubing the spiders..."
+Write-Host ""
+Write-Host ""
+Write-Host "Greasing the pot..."
+Write-Host "Lubing the spiders."
 Start-Sleep 2
-# Get the drive letter of the script location if run from usb
-#$scriptDrive = (Get-Item -Path $MyInvocation.MyCommand.Path).PSDrive.Root
+# Get the drive letter of the script location
+$scriptDrive = (Get-Item -Path $MyInvocation.MyCommand.Path).PSDrive.Root
 
 # Define source and destination paths
-#$sourcePath = Join-Path -Path $scriptDrive -ChildPath "Tech_Folder\Tech Scripts\Mal_Main\Current\Web Applications\Icons"
-
-#$destinationPath = "C:\Tech_Folder\Libs\"
+$sourcePath = Join-Path -Path $scriptDrive -ChildPath "Tech_Folder\Tech Scripts\Mal_Main\Current\Web Applications\Icons"
+$destinationPath = "C:\Tech_Folder\Libs\"
 
 # Check if the destination path exists, if not, create it
-#if (!(Test-Path -Path $destinationPath)) {
-#    New-Item -Path $destinationPath -ItemType Directory
-#}
+if (!(Test-Path -Path $destinationPath)) {
+    New-Item -Path $destinationPath -ItemType Directory
+}
 
 # Copy the directories and files from the source to the destination with overwrite
-#Write-OutputToTextBox "Copying files from '$sourcePath' to '$destinationPath'..."
-#Copy-Item -Path $sourcePath -Destination $destinationPath -Recurse -Force -PassThru | ForEach-Object {
-#    Write-OutputToTextBox "Copied: $($_.FullName)"
-#}
-#Write-OutputToTextBox "Copy operation completed."
+Write-Host "Copying files from '$sourcePath' to '$destinationPath'..."
+Copy-Item -Path $sourcePath -Destination $destinationPath -Recurse -Force -PassThru | ForEach-Object {
+    Write-Host "Copied: $($_.FullName)"
+}
+Write-Host "Copy operation completed."
 clear
 
-Write-OutputToTextBox "Web Apps are being installed, please wait until fully completed......." -ForeGround Yellow
-Write-OutputToTextBox "Your screen may FLICKER BLACK during this process. Just chill Dude..." -ForegroundColor DarkYellow
+Write-Host "Web Apps are being installed, please wait until fully completed......." -ForeGround Yellow
+Write-Host "Your screen may FLICKER BLACK during this process. Just chill Dude..." -ForegroundColor DarkYellow
 
 Sleep 5
 
@@ -1285,7 +1444,7 @@ foreach ($app in $apps) {
     $Shortcut.Save()
 
   # Log installed apps
-    Write-OutputToTextBox "Installed: $($app.Name) from $($app.URL)" -ForegroundColor Cyan
+    Write-Host "Installed: $($app.Name) from $($app.URL)" -ForegroundColor Cyan
     
     }
 
@@ -1296,40 +1455,81 @@ Stop-Process -Name "msedge" -Force
 Start-Sleep 2 
 
 # Run the Final message
-Write-OutputToTextBox ""
-Write-OutputToTextBox ""
-Write-OutputToTextBox ""
-Write-OutputToTextBox "Tweak Settings completed, please reboot your computer"-ForegroundColor Blue
-Write-OutputToTextBox ""
-Write-OutputToTextBox "All operations completed successfully. Your system is now optimized for performance." -ForegroundColor White
-Write-OutputToTextBox ""
-Write-OutputToTextBox "Thank you for using Windows Tweak & Squeak Toolbox!" -ForegroundColor Cyan
-Write-OutputToTextBox ""
-Write-OutputToTextBox "....We will be adding more soon. MGM 21-2-25"
+Write-Host ""
+Write-Host ""
+Write-Host ""
+Write-Host "Tweak Settings completed, please reboot your computer"-ForegroundColor Blue
+Write-Host ""
+Write-Host "All operations completed successfully. Your system is now optimized for performance." -ForegroundColor White
+Write-Host ""
+Write-Host "Thank you for using Windows Tweak & Squeak Toolbox!" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "....We will be adding more soon. MGM 1-9-24"
 
 # Run out message - Mission Impossible
 
-Write-OutputToTextBox ""
-Write-OutputToTextBox ""
-Write-OutputToTextBox ""
-Write-OutputToTextBox ""
-Write-OutputToTextBox "________________________________________________________________________________________________>>>" -ForegroundColor Green
-Write-OutputToTextBox "________________________________________________________________________________________________>>>" -ForegroundColor Green
-Write-OutputToTextBox "        Nothing is impossible ! Believe with all your heart and LIVE in the moment you SEE !!      " -ForegroundColor White
-Write-OutputToTextBox "________________________________________________________________________________________________>>>" -ForegroundColor Green
-Write-OutputToTextBox "________________________________________________________________________________________________>>>" -ForegroundColor Green
-                    } catch {
-                        Write-OutputToTextBox "Error: $_" "Red"
-                    }
-                  }
-              }
-          }
-      }
-  })
+Write-Host ""
+Write-Host ""
+Write-Host ""
+Write-Host ""
+Write-Host "________________________________________________________________________________________________>>>" -ForegroundColor Green
+Write-Host "________________________________________________________________________________________________>>>" -ForegroundColor Green
+Write-Host "Nothing is impossible ! Believe with all your heart and LIVE in the moment you SEE !! " -ForegroundColor White
+Write-Host "________________________________________________________________________________________________>>>" -ForegroundColor Green
+Write-Host "________________________________________________________________________________________________>>>" -ForegroundColor Green
 
-$panelRight.Controls.Add($outputTextBox)
-$panelRight.Controls.Add($runButton)
-$mainPanel.Panel2.Controls.Add($panelRight)
 
-$form.Controls.Add($mainPanel)
-$form.ShowDialog()
+try {
+	[System.Console]::Beep(784,150)
+	Start-Sleep -m 75
+	[System.Console]::Beep(784,150)
+	Start-Sleep -m 750
+	[System.Console]::Beep(932,150)
+	Start-Sleep -m 75
+	[System.Console]::Beep(1047,150)
+	Start-Sleep -m 75
+	[System.Console]::Beep(784,150)
+	Start-Sleep -m 75
+	[System.Console]::Beep(784,150)
+	Start-Sleep -m 150
+	[console]::Beep(699,150)
+	Start-Sleep -m 75
+	[System.Console]::Beep(740,150)
+	Start-Sleep -m 75
+	[System.Console]::Beep(784,150)
+	Start-Sleep -m 150
+	[System.Console]::Beep(784,150)
+	Start-Sleep -m 150
+	[System.Console]::Beep(932,150)
+	Start-Sleep -m 75
+	[System.Console]::Beep(1047,150)
+	Start-Sleep -m 75
+	[System.Console]::Beep(784,150)
+	Start-Sleep -m 150
+	[System.Console]::Beep(784,150)
+	Start-Sleep -m 150
+	[System.Console]::Beep(699,150)
+	Start-Sleep -m 75
+	[System.Console]::Beep(740,150)
+	Start-Sleep -m 75
+	[System.Console]::Beep(932,150)
+	[System.Console]::Beep(784,150)
+	[System.Console]::Beep(587,1200)
+	Start-Sleep -m 37
+	[System.Console]::Beep(932,150)
+	[System.Console]::Beep(784,150)
+	[System.Console]::Beep(554,1200)
+	Start-Sleep -m 37
+	[System.Console]::Beep(932,150)
+	[System.Console]::Beep(784,150)
+	[System.Console]::Beep(523,1200)
+	Start-Sleep -m 75
+	[System.Console]::Beep(466,150)
+	[System.Console]::Beep(523,150)
+	exit 0 # success
+} catch {
+	"⚠️ Error in line $($_.InvocationInfo.ScriptLineNumber): $($Error[0])"
+	exit 1
+}
+
+Write-Host "100 % complete, (⚠️ please reboot now..)"
