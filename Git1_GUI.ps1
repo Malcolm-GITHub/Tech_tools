@@ -1,4 +1,6 @@
-﻿Add-Type -AssemblyName System.Windows.Forms
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Bypass
+
+Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
 # Create the form
