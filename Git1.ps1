@@ -977,7 +977,7 @@ Start-Process -FilePath "cleanmgr.exe" -ArgumentList "/c /Sageset:65535 /Sagerun
 
 # Define the target directory and icon source path
 $targetDir = "C:\Tech_Folder"
-$iconSourcePath = "$PSScriptRoot\Libs\Icons\Win11_ico\Shell32_250.ico"
+$iconSourcePath = "C:\Tech_Folder\Libs\Icons\Win11_ico\Shell32_250.ico"
 $iconDestinationPath = "$targetDir\Libs\Icons\Win11_ico\Shell32_250.ico"
 
 # Check if the target directory exists, if not, create it
